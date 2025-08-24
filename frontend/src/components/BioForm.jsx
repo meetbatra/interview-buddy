@@ -46,7 +46,7 @@ const BioForm = ({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label htmlFor="bio" className="block mb-2 font-medium">
+        <label htmlFor="bio" className="block mb-2 font-medium text-gray-300">
           Bio
         </label>
         <Textarea
@@ -55,10 +55,15 @@ const BioForm = ({
           onChange={(e) => setBio(e.target.value)}
           placeholder="Enter a short bio about yourself"
           disabled={loading}
+          className="bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-blue-400"
         />
       </div>
-      {error && <div className="text-red-500 text-sm">{error}</div>}
-      <Button type="submit" disabled={loading}>
+      {error && <div className="text-red-400 text-sm">{error}</div>}
+      <Button 
+        type="submit" 
+        disabled={loading}
+        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-mono cursor-pointer"
+      >
         {loading ? "Starting Interview..." : "Start Interview"}
       </Button>
     </form>

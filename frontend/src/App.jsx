@@ -1,49 +1,43 @@
 import { useState } from 'react';
-import ResumeUpload from './components/ResumeUpload';
-import BioForm from './components/BioForm';
-import logo from "@/assets/logo.png";
+import AnimatedBackground from './components/AnimatedBackground';
+import Header from './components/Header';
+import Footer from './components/Footer';
+import HomePage from './components/HomePage';
+import InterviewPage from './components/InterviewPage';
+import SummaryPage from './components/SummaryPage';
 
 function App() {
-  const [step, setStep] = useState('upload')
-  const [sessionId, setSessionId] = useState(null)
-  const [resumeFile, setResumeFile] = useState(null)
-  const [bio, setBio] = useState('')
-  const [firstQuestion, setFirstQuestion] = useState('')
+  const [step, setStep] = useState('upload');
+  const [sessionId, setSessionId] = useState(null);
+  const [firstQuestion, setFirstQuestion] = useState('');
 
   return (
-    <div className="min-h-screen bg-gray-400 flex flex-col">
-      <main className="flex-grow flex items-center justify-center">
+    <div className="h-screen relative overflow-hidden flex flex-col">
+      <AnimatedBackground />
+      
+      <Header />
+
+      <main className="relative z-10 flex-1 flex items-center justify-center px-6 overflow-hidden">
         {step === 'upload' && (
-          <div className="flex justify-between w-full p-30">
-            <img src={logo} className="h-120 rounded-full opacity-70"></img>
-            <div className="max-w-md w-full bg-white p-6 rounded-lg shadow-lg space-y-6">
-              <ResumeUpload setResumeFile={setResumeFile} />
-              <BioForm
-                resumeFile={resumeFile}
-                bio={bio}
-                setBio={setBio}
-                setSessionId={setSessionId}
-                setStep={setStep}
-                setFirstQuestion={setFirstQuestion}
-              />
-            </div>
-          </div>
+          <HomePage
+            setSessionId={setSessionId}
+            setStep={setStep}
+            setFirstQuestion={setFirstQuestion}
+          />
         )}
+        
         {step === 'interview' && (
-          <div>
-            {/* <ChatWindow sessionId={sessionId} firstQuestion={firstQuestion} /> */}
-            <div>ChatWindow Placeholder (sessionId: {sessionId}, firstQuestion: {firstQuestion})</div>
-          </div>
+          <InterviewPage sessionId={sessionId} firstQuestion={firstQuestion} />
         )}
+        
         {step === 'summary' && (
-          <div>
-            {/* <Summary /> */}
-            <div>Summary Placeholder</div>
-          </div>
+          <SummaryPage />
         )}
       </main>
+
+      <Footer />
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
