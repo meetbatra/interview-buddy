@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { getNextQuestion } from '../api/interviewApi';
 
 export const useInterviewLogic = (sessionId, firstQuestion, firstQuestionAudioUrl, onClose) => {
   // State management
@@ -11,6 +12,7 @@ export const useInterviewLogic = (sessionId, firstQuestion, firstQuestionAudioUr
   const [isVisible, setIsVisible] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const [showExitConfirmation, setShowExitConfirmation] = useState(false);
+  const [isProcessingResponse, setIsProcessingResponse] = useState(false);
   
   // Refs
   const messagesEndRef = useRef(null);
@@ -66,6 +68,29 @@ export const useInterviewLogic = (sessionId, firstQuestion, firstQuestionAudioUr
       document.removeEventListener('keydown', handleEscapeKey);
     };
   }, [showExitConfirmation]);
+
+  // Handle space key for mic control
+  useEffect(() => {
+    const handleSpaceKey = (event) => {
+      if (event.code === 'Space' && !isInterviewComplete && !isAudioPlaying && !isProcessingResponse) {
+        // Prevent default behavior (page scroll)
+        event.preventDefault();
+        
+        if (isMicEnabled) {
+          if (isRecording) {
+            stopRecording();
+          } else {
+            startRecording();
+          }
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleSpaceKey);
+    return () => {
+      document.removeEventListener('keydown', handleSpaceKey);
+    };
+  }, [isRecording, isMicEnabled, isInterviewComplete, isAudioPlaying, isProcessingResponse]);
 
   // Initialize first question
   useEffect(() => {
@@ -176,24 +201,16 @@ export const useInterviewLogic = (sessionId, firstQuestion, firstQuestionAudioUr
       timestamp: new Date()
     };
     setMessages(prev => [...prev, userMessage]);
+    setIsProcessingResponse(true);
 
     try {
-      const response = await fetch(`http://localhost:8080/api/interview/${sessionId}/next-question`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          answer: transcript,
-          questionIndex: currentQuestionIndex 
-        }),
-      });
-
-      const data = await response.json();
+      const response = await getNextQuestion(sessionId, transcript, currentQuestionIndex);
+      const data = response.data;
 
       if (data.success) {
         if (data.isComplete) {
           setIsInterviewComplete(true);
+          setIsProcessingResponse(false);
           const completionMessage = {
             id: messages.length + 2,
             type: 'system',
@@ -202,6 +219,7 @@ export const useInterviewLogic = (sessionId, firstQuestion, firstQuestionAudioUr
           };
           setMessages(prev => [...prev, completionMessage]);
         } else {
+          setIsProcessingResponse(false);
           const nextQuestion = {
             id: messages.length + 2,
             type: 'question',
@@ -218,6 +236,7 @@ export const useInterviewLogic = (sessionId, firstQuestion, firstQuestionAudioUr
       }
     } catch (error) {
       console.error('Error getting next question:', error);
+      setIsProcessingResponse(false);
       const errorMessage = {
         id: messages.length + 2,
         type: 'system',
@@ -273,6 +292,7 @@ export const useInterviewLogic = (sessionId, firstQuestion, firstQuestionAudioUr
     isVisible,
     isClosing,
     showExitConfirmation,
+    isProcessingResponse,
     
     // Refs
     messagesEndRef,

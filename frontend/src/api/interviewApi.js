@@ -10,3 +10,10 @@ export const startInterview = (resume, bio) => {
   formData.append('bio', bio);
   return api.post('/start', formData);
 };
+
+export const getNextQuestion = (sessionId, answer, questionIndex) => {
+  return api.post(`/${sessionId}/next`, {
+    answer,
+    questionIndex
+  });
+};

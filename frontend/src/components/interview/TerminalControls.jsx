@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Mic, MicOff, Volume2 } from 'lucide-react';
+import { Mic, MicOff, Volume2, Brain } from 'lucide-react';
 
 const TerminalControls = ({ 
   isVisible,
@@ -8,6 +8,7 @@ const TerminalControls = ({
   isRecording,
   isMicEnabled,
   isInterviewComplete,
+  isProcessingResponse,
   onStopTTS,
   onStartRecording,
   onStopRecording,
@@ -34,7 +35,13 @@ const TerminalControls = ({
               </Button>
             </div>
           )}
-          {!isAudioPlaying && !isMicEnabled && !isInterviewComplete && (
+          {isProcessingResponse && (
+            <div className="flex items-center space-x-2 text-cyan-400">
+              <Brain className="w-4 h-4 animate-pulse" />
+              <span>ai.processing_response</span>
+            </div>
+          )}
+          {!isAudioPlaying && !isMicEnabled && !isInterviewComplete && !isProcessingResponse && (
             <div className="text-yellow-400">
               <span>status: </span>
               <span className="text-gray-300">waiting_for_audio</span>
@@ -46,7 +53,7 @@ const TerminalControls = ({
               <span>mic.recording</span>
             </div>
           )}
-          {isMicEnabled && !isRecording && !isAudioPlaying && (
+          {isMicEnabled && !isRecording && !isAudioPlaying && !isProcessingResponse && (
             <div className="text-green-400">
               <span>mic.ready</span>
             </div>

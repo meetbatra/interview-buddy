@@ -16,6 +16,7 @@ const InterviewPage = ({ sessionId, firstQuestion, firstQuestionAudioUrl, onClos
     isVisible,
     isClosing,
     showExitConfirmation,
+    isProcessingResponse,
     
     // Refs
     messagesEndRef,
@@ -74,6 +75,7 @@ const InterviewPage = ({ sessionId, firstQuestion, firstQuestionAudioUrl, onClos
           isRecording={isRecording}
           isMicEnabled={isMicEnabled}
           isInterviewComplete={isInterviewComplete}
+          isProcessingResponse={isProcessingResponse}
           onStopTTS={stopTTS}
           onStartRecording={startRecording}
           onStopRecording={stopRecording}

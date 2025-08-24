@@ -6,6 +6,6 @@ const router = express.Router();
 const upload = multer({ dest: "uploads/"});
 
 router.post('/start', upload.single('resume'), startInterview);
-router.post('/:sessionId/next-question', getNextQuestion);
+router.post('/:sessionId/next', getNextQuestion);
 
 module.exports = router;
