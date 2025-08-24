@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { startInterview } from "../api/interviewApi";
+import { startInterview } from "../../api/interviewApi";
 
 const BioForm = ({
   resumeFile,
@@ -10,6 +10,8 @@ const BioForm = ({
   setSessionId,
   setStep,
   setFirstQuestion,
+  setFirstQuestionAudioUrl,
+  onStartInterview,
 }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -32,7 +34,18 @@ const BioForm = ({
         console.log(result.data);
         setSessionId(result.data.sessionId);
         setFirstQuestion(result.data.firstQuestion);
-        setStep("interview");
+        
+        // Set the audio URL if provided
+        if (result.data.audioUrl) {
+          setFirstQuestionAudioUrl(result.data.audioUrl);
+        }
+        
+        // Open interview modal instead of changing step
+        if (onStartInterview) {
+          onStartInterview();
+        } else {
+          setStep("interview"); // Fallback for backward compatibility
+        }
       } else {
         setError("Failed to start interview. Please try again.");
       }

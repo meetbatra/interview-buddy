@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import logo from "@/assets/logo.png";
-import ResumeUpload from "./ResumeUpload";
-import BioForm from "./BioForm";
-import CodeEditor from "./CodeEditor";
+import ResumeUpload from "../components/home/ResumeUpload";
+import BioForm from "../components/home/BioForm";
+import CodeEditor from "../components/home/CodeEditor";
 
 const HomePage = ({ 
   setSessionId, 
   setStep, 
-  setFirstQuestion 
+  setFirstQuestion,
+  setFirstQuestionAudioUrl,
+  onStartInterview 
 }) => {
   const [resumeFile, setResumeFile] = useState(null);
   const [bio, setBio] = useState('');
@@ -46,6 +48,8 @@ const HomePage = ({
                 setSessionId={setSessionId}
                 setStep={setStep}
                 setFirstQuestion={setFirstQuestion}
+                setFirstQuestionAudioUrl={setFirstQuestionAudioUrl}
+                onStartInterview={onStartInterview}
               />
             </CodeEditor>
           </div>
