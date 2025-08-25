@@ -1,0 +1,118 @@
+import { useState, useEffect } from 'react';
+import { Button } from "@/components/ui/button";
+import { ArrowLeft, Loader2 } from "lucide-react";
+import { getReport } from '../api/interviewApi';
+import SummaryCard from '../components/report/SummaryCard';
+import Scorecard from '../components/report/Scorecard';
+import StrengthWeakness from '../components/report/StrengthWeakness';
+import ConversationHistory from '../components/report/ConversationHistory';
+
+const ReportPage = ({ sessionId, onBack }) => {
+  const [reportData, setReportData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch report data
+  useEffect(() => {
+    const fetchReportData = async () => {
+      try {
+        setLoading(true);
+        const response = await getReport(sessionId);
+        console.log(response.data);
+        setReportData(response.data);
+      } catch (err) {
+        console.error('Error fetching report:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (sessionId) {
+      fetchReportData();
+    }
+  }, [sessionId]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-white" />
+          <p className="text-gray-300">Loading interview report...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error && !reportData) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center max-w-md mx-auto p-6">
+          <div className="text-red-400 mb-4">
+            <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+          </div>
+          <h2 className="text-xl font-semibold text-white mb-2">Error Loading Report</h2>
+          <p className="text-gray-300 mb-4">{error}</p>
+          <Button onClick={onBack} variant="outline" className="bg-white/10 backdrop-blur-md border-white/20 text-white hover:bg-white/20 hover:border-white/30 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Go Back
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-full">
+      <div className="container mx-auto px-4 py-8 max-w-6xl">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-4">
+            <Button 
+              onClick={onBack} 
+              variant="outline"
+              className="flex items-center gap-2 bg-white/10 backdrop-blur-md border-white/20 text-white hover:bg-white/20 hover:border-white/30 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back
+            </Button>
+            <div>
+              <h1 className="text-3xl font-bold text-white">Interview Report</h1>
+              <p className="text-gray-300">Session ID: {sessionId}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Report Content */}
+        <div className="space-y-8 pb-8">
+          {/* Summary */}
+          {reportData?.summary && <SummaryCard summary={reportData.summary} />}
+
+          {/* Scorecard */}
+          {reportData?.scores && <Scorecard scores={reportData.scores} />}
+
+          {/* Strengths & Weaknesses */}
+          {(reportData?.strengths || reportData?.weaknesses) && (
+            <StrengthWeakness 
+              strengths={reportData?.strengths} 
+              weaknesses={reportData?.weaknesses} 
+            />
+          )}
+
+          {/* Conversation History */}
+          {reportData?.messages && <ConversationHistory messages={reportData.messages} />}
+        </div>
+
+        {/* Footer */}
+        <div className="mt-12 text-center text-gray-400 text-sm">
+          <p>Report generated on {new Date().toLocaleDateString()}</p>
+          <p className="mt-1">Interview Buddy - AI-Powered Interview Assistant</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ReportPage;

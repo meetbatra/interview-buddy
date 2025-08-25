@@ -4,7 +4,7 @@ import Header from '../components/shared/Header';
 import Footer from '../components/shared/Footer';
 import HomePage from './HomePage';
 import InterviewPage from './InterviewPage';
-import SummaryPage from './SummaryPage';
+import ReportPage from './ReportPage';
 
 function App() {
   const [step, setStep] = useState('upload');
@@ -31,12 +31,12 @@ function App() {
   };
 
   return (
-    <div className="h-screen relative overflow-hidden flex flex-col">
+    <div className="h-screen relative flex flex-col">
       <AnimatedBackground />
       
       <Header />
 
-      <main className="relative z-10 flex-1 flex items-center justify-center px-6 overflow-hidden">
+      <main className={`relative z-10 flex-1 ${step === 'summary' ? 'overflow-y-auto' : 'flex items-center justify-center overflow-hidden'} px-6`}>
         {step === 'upload' && (
           <HomePage
             setSessionId={setSessionId}
@@ -48,7 +48,15 @@ function App() {
         )}
         
         {step === 'summary' && (
-          <SummaryPage />
+          <ReportPage 
+            sessionId={sessionId}
+            onBack={() => {
+              setStep('upload');
+              setSessionId(null);
+              setFirstQuestion('');
+              setFirstQuestionAudioUrl('');
+            }}
+          />
         )}
       </main>
 

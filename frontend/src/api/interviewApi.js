@@ -17,3 +17,7 @@ export const getNextQuestion = (sessionId, answer, questionIndex) => {
     questionIndex
   });
 };
+
+export const getReport = (sessionId) => {
+  return api.get(`/${sessionId}/report`);
+};

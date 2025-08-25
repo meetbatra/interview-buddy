@@ -12,6 +12,17 @@ const conversationSchema = new mongoose.Schema({
   }
 }, { _id: false });
 
+const analysisSchema = new mongoose.Schema({
+  summary: String,
+  scores: {
+    technical: Number,
+    communication: Number,
+    confidence: Number
+  },
+  strengths: [String],
+  weaknesses: [String]
+}, { _id: false });
+
 const interviewSessionSchema = new mongoose.Schema({
   resumeText: {
     type: String,
@@ -19,10 +30,21 @@ const interviewSessionSchema = new mongoose.Schema({
   },
   bio: String,
   conversation: [conversationSchema],
+  analysis: analysisSchema,
   createdAt: {
     type: Date,
     default: Date.now
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now
   }
+});
+
+// Update the updatedAt field before saving
+interviewSessionSchema.pre('save', function(next) {
+  this.updatedAt = Date.now();
+  next();
 });
 
 module.exports = mongoose.model('InterviewSession', interviewSessionSchema);
