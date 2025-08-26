@@ -1,76 +1,65 @@
-import { useState } from 'react';
+import { Routes, Route } from 'react-router-dom';
+import useAuthStore from '../stores/authStore';
 import AnimatedBackground from '../components/shared/AnimatedBackground';
 import Header from '../components/shared/Header';
 import Footer from '../components/shared/Footer';
 import HomePage from './HomePage';
+import LoginPage from './LoginPage';
+import SignupPage from './SignupPage';
 import InterviewPage from './InterviewPage';
 import ReportPage from './ReportPage';
 
 function App() {
-  const [step, setStep] = useState('upload');
-  const [sessionId, setSessionId] = useState(null);
-  const [firstQuestion, setFirstQuestion] = useState('');
-  const [firstQuestionAudioUrl, setFirstQuestionAudioUrl] = useState('');
-  const [showInterviewModal, setShowInterviewModal] = useState(false);
+  const { isLoading } = useAuthStore();
 
-  const handleStartInterview = () => {
-    setShowInterviewModal(true);
-  };
-
-  const handleCloseInterview = (isCompleted = false) => {
-    setShowInterviewModal(false);
-    if (isCompleted) {
-      setStep('summary'); // Move to summary only if interview was completed
-    } else {
-      // Reset state and go back to upload page if interview was quit
-      setStep('upload');
-      setSessionId(null);
-      setFirstQuestion('');
-      setFirstQuestionAudioUrl('');
-    }
-  };
+  // Show loading screen while checking authentication
+  if (isLoading) {
+    return (
+      <div className="h-screen relative flex flex-col">
+        <AnimatedBackground />
+        <div className="relative z-10 flex-1 flex items-center justify-center">
+          <div className="text-white text-xl">Loading...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="h-screen relative flex flex-col">
+    <div className="min-h-screen relative flex flex-col">
       <AnimatedBackground />
       
+      {/* Sticky Header */}
       <Header />
-
-      <main className={`relative z-10 flex-1 ${step === 'summary' ? 'overflow-y-auto' : 'flex items-center justify-center overflow-hidden'} px-6`}>
-        {step === 'upload' && (
-          <HomePage
-            setSessionId={setSessionId}
-            setStep={setStep}
-            setFirstQuestion={setFirstQuestion}
-            setFirstQuestionAudioUrl={setFirstQuestionAudioUrl}
-            onStartInterview={handleStartInterview}
-          />
-        )}
-        
-        {step === 'summary' && (
-          <ReportPage 
-            sessionId={sessionId}
-            onBack={() => {
-              setStep('upload');
-              setSessionId(null);
-              setFirstQuestion('');
-              setFirstQuestionAudioUrl('');
-            }}
-          />
-        )}
+      
+      {/* Main Content Area */}
+      <main className="relative z-10 flex-1 flex flex-col">
+        <Routes>
+          <Route path="/" element={
+            <div className="flex-1 flex items-center justify-center px-6">
+              <HomePage />
+            </div>
+          } />
+          <Route path="/login" element={
+            <div className="flex-1 flex items-center justify-center px-6">
+              <LoginPage />
+            </div>
+          } />
+          <Route path="/signup" element={
+            <div className="flex-1 flex items-center justify-center px-6">
+              <SignupPage />
+            </div>
+          } />
+          <Route path="/interview" element={<InterviewPage />} />
+          <Route path="/report" element={
+            <div className="flex-1 overflow-y-auto">
+              <ReportPage />
+            </div>
+          } />
+        </Routes>
       </main>
-
+      
+      {/* Sticky Footer */}
       <Footer />
-
-      {/* Interview Modal */}
-      {showInterviewModal && sessionId && firstQuestion && (
-        <InterviewPage 
-          sessionId={sessionId} 
-          firstQuestion={firstQuestion}
-          firstQuestionAudioUrl={firstQuestionAudioUrl}
-          onClose={handleCloseInterview}
-        />
-      )}
     </div>
   );
 }

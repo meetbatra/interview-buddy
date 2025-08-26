@@ -1,7 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
+import useAuthStore from '../stores/authStore';
 import { getNextQuestion } from '../api/interviewApi';
 
 export const useInterviewLogic = (sessionId, firstQuestion, firstQuestionAudioUrl, onClose) => {
+  // Get auth token
+  const { token } = useAuthStore();
+  
   // State management
   const [messages, setMessages] = useState([]);
   const [isRecording, setIsRecording] = useState(false);
@@ -204,7 +208,7 @@ export const useInterviewLogic = (sessionId, firstQuestion, firstQuestionAudioUr
     setIsProcessingResponse(true);
 
     try {
-      const response = await getNextQuestion(sessionId, transcript, currentQuestionIndex);
+      const response = await getNextQuestion(sessionId, transcript, currentQuestionIndex, token);
       const data = response.data;
 
       if (data.success) {

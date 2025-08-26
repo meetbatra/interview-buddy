@@ -1,4 +1,7 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import useAuthStore from '../stores/authStore';
+import useInterviewStore from '../stores/interviewStore';
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { getReport } from '../api/interviewApi';
@@ -7,31 +10,54 @@ import Scorecard from '../components/report/Scorecard';
 import StrengthWeakness from '../components/report/StrengthWeakness';
 import ConversationHistory from '../components/report/ConversationHistory';
 
-const ReportPage = ({ sessionId, onBack }) => {
+const ReportPage = () => {
   const [reportData, setReportData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
+  
+  const { token, isAuthenticated } = useAuthStore();
+  const { sessionId, clearSession } = useInterviewStore();
+
+  // Redirect if no session or not authenticated
+  useEffect(() => {
+    if (!sessionId || !isAuthenticated) {
+      navigate('/');
+      return;
+    }
+  }, [sessionId, isAuthenticated, navigate]);
 
   // Fetch report data
   useEffect(() => {
     const fetchReportData = async () => {
       try {
         setLoading(true);
-        const response = await getReport(sessionId);
+        const response = await getReport(sessionId, token);
         console.log(response.data);
         setReportData(response.data);
       } catch (err) {
         console.error('Error fetching report:', err);
-        setError(err.message);
+        if (err.response?.status === 401) {
+          setError('Authentication required. Please log in again.');
+        } else if (err.response?.status === 403) {
+          setError('Access denied. This report does not belong to you.');
+        } else {
+          setError(err.message);
+        }
       } finally {
         setLoading(false);
       }
     };
 
-    if (sessionId) {
+    if (sessionId && token) {
       fetchReportData();
     }
-  }, [sessionId]);
+  }, [sessionId, token]);
+
+  const handleBack = () => {
+    clearSession();
+    navigate('/');
+  };
 
   if (loading) {
     return (
@@ -55,7 +81,7 @@ const ReportPage = ({ sessionId, onBack }) => {
           </div>
           <h2 className="text-xl font-semibold text-white mb-2">Error Loading Report</h2>
           <p className="text-gray-300 mb-4">{error}</p>
-          <Button onClick={onBack} variant="outline" className="bg-white/10 backdrop-blur-md border-white/20 text-white hover:bg-white/20 hover:border-white/30 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105">
+          <Button onClick={handleBack} variant="outline" className="bg-white/10 backdrop-blur-md border-white/20 text-white hover:bg-white/20 hover:border-white/30 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Go Back
           </Button>
@@ -65,13 +91,13 @@ const ReportPage = ({ sessionId, onBack }) => {
   }
 
   return (
-    <div className="w-full">
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
+    <div className="w-full min-h-full">
+      <div className="container mx-auto px-4 py-6 max-w-6xl">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
             <Button 
-              onClick={onBack} 
+              onClick={handleBack} 
               variant="outline"
               className="flex items-center gap-2 bg-white/10 backdrop-blur-md border-white/20 text-white hover:bg-white/20 hover:border-white/30 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
             >
@@ -79,14 +105,14 @@ const ReportPage = ({ sessionId, onBack }) => {
               Back
             </Button>
             <div>
-              <h1 className="text-3xl font-bold text-white">Interview Report</h1>
-              <p className="text-gray-300">Session ID: {sessionId}</p>
+              <h1 className="text-2xl md:text-3xl font-bold text-white">Interview Report</h1>
+              <p className="text-gray-300 text-sm">Session ID: {sessionId}</p>
             </div>
           </div>
         </div>
 
         {/* Report Content */}
-        <div className="space-y-8 pb-8">
+        <div className="space-y-6 pb-6">
           {/* Summary */}
           {reportData?.summary && <SummaryCard summary={reportData.summary} />}
 
@@ -106,7 +132,7 @@ const ReportPage = ({ sessionId, onBack }) => {
         </div>
 
         {/* Footer */}
-        <div className="mt-12 text-center text-gray-400 text-sm">
+        <div className="mt-8 text-center text-gray-400 text-sm">
           <p>Report generated on {new Date().toLocaleDateString()}</p>
           <p className="mt-1">Interview Buddy - AI-Powered Interview Assistant</p>
         </div>

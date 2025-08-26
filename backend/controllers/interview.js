@@ -2,15 +2,32 @@ const { parseResume } = require("../services/pdfService");
 const { generateContent } = require("../services/geminiService");
 const murfService = require("../services/murffService");
 const InterviewSession = require("../models/interviewSession");
+const fs = require('fs');
 
 module.exports.startInterview = async (req, res) => {
   try {
+    // Check if user is authenticated
+    if (!req.user) {
+      return res.status(401).json({ error: 'Authentication required to start interview.' });
+    }
+
     const resumeFile = req.file;
     const bio = req.body.bio;
     if (!resumeFile || !bio) {
       return res.status(400).json({ error: 'Resume and bio are required.' });
     }
+    
     const resumeText = await parseResume(resumeFile.path);
+    
+    // Delete the resume file after extracting text to save space
+    try {
+      fs.unlinkSync(resumeFile.path);
+      console.log(`Deleted resume file: ${resumeFile.path}`);
+    } catch (deleteErr) {
+      console.warn(`Failed to delete resume file: ${resumeFile.path}`, deleteErr);
+      // Continue with the process even if file deletion fails
+    }
+    
     const prompt = `You are an interviewer. Based on this resume: ${resumeText} and this bio: ${bio}, return a JSON object with two fields: "resumeSummary" (bullet points summarizing skills, projects, and education) and "firstQuestion" (the first interview question to ask).`;
     const geminiResponse = await generateContent(prompt);
     let cleanedResponse = geminiResponse
@@ -24,6 +41,7 @@ module.exports.startInterview = async (req, res) => {
     const audioUrl = await murfService.generateSpeech(firstQuestion);
     
     const session = new InterviewSession({
+      userId: req.user.id, // Store the authenticated user's ID
       resumeText: resumeSummary.join(' '),
       bio,
       conversation: [{ role: 'ai', message: firstQuestion }],
@@ -43,6 +61,11 @@ module.exports.startInterview = async (req, res) => {
 
 module.exports.getNextQuestion = async (req, res) => {
   try {
+    // Check if user is authenticated
+    if (!req.user) {
+      return res.status(401).json({ error: 'Authentication required.' });
+    }
+
     const { sessionId } = req.params;
     const { answer, questionIndex } = req.body;
 
@@ -50,10 +73,15 @@ module.exports.getNextQuestion = async (req, res) => {
       return res.status(400).json({ error: 'Session ID and answer are required.' });
     }
 
-    // Find the session
+    // Find the session and verify ownership
     const session = await InterviewSession.findById(sessionId);
     if (!session) {
       return res.status(404).json({ error: 'Session not found.' });
+    }
+
+    // Verify that the session belongs to the authenticated user
+    if (session.userId.toString() !== req.user.id) {
+      return res.status(403).json({ error: 'Access denied. This session does not belong to you.' });
     }
 
     // Add user answer to conversation
@@ -122,11 +150,21 @@ Return only the next question, nothing else.`;
 // Generate interview report
 module.exports.getReport = async (req, res) => {
   try {
+    // Check if user is authenticated
+    if (!req.user) {
+      return res.status(401).json({ error: 'Authentication required.' });
+    }
+
     const { sessionId } = req.params;
     
     const session = await InterviewSession.findById(sessionId);
     if (!session) {
       return res.status(404).json({ error: 'Interview session not found.' });
+    }
+
+    // Verify that the session belongs to the authenticated user
+    if (session.userId.toString() !== req.user.id) {
+      return res.status(403).json({ error: 'Access denied. This session does not belong to you.' });
     }
 
     // Generate AI analysis if not already done

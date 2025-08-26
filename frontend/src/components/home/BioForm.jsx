@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import useAuthStore from "../../stores/authStore";
+import useInterviewStore from "../../stores/interviewStore";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { startInterview } from "../../api/interviewApi";
@@ -7,18 +10,24 @@ const BioForm = ({
   resumeFile,
   bio,
   setBio,
-  setSessionId,
-  setStep,
-  setFirstQuestion,
-  setFirstQuestionAudioUrl,
-  onStartInterview,
 }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
+  
+  const { token, isAuthenticated } = useAuthStore();
+  const { setSessionData } = useInterviewStore();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+
+    // Check if user is authenticated
+    if (!isAuthenticated) {
+      setError("Please log in to start an interview.");
+      return;
+    }
+
     if (!resumeFile) {
       setError("Please upload your resume.");
       return;
@@ -29,28 +38,29 @@ const BioForm = ({
     }
     setLoading(true);
     try {
-      const result = await startInterview(resumeFile, bio);
+      const result = await startInterview(resumeFile, bio, token);
       if (result && result.data.sessionId && result.data.firstQuestion) {
         console.log(result.data);
-        setSessionId(result.data.sessionId);
-        setFirstQuestion(result.data.firstQuestion);
         
-        // Set the audio URL if provided
-        if (result.data.audioUrl) {
-          setFirstQuestionAudioUrl(result.data.audioUrl);
-        }
+        // Store session data in Zustand store
+        setSessionData(
+          result.data.sessionId, 
+          result.data.firstQuestion, 
+          result.data.audioUrl || ''
+        );
         
-        // Open interview modal instead of changing step
-        if (onStartInterview) {
-          onStartInterview();
-        } else {
-          setStep("interview"); // Fallback for backward compatibility
-        }
+        // Navigate to interview page
+        navigate('/interview');
       } else {
         setError("Failed to start interview. Please try again.");
       }
     } catch (err) {
-      setError("Error starting interview. Please try again.");
+      console.error('Interview start error:', err);
+      if (err.response?.status === 401) {
+        setError("Authentication required. Please log in again.");
+      } else {
+        setError("Error starting interview. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
@@ -58,6 +68,15 @@ const BioForm = ({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Authentication notice for non-logged in users */}
+      {!isAuthenticated && (
+        <div className="p-3 mb-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+          <p className="text-blue-300 text-sm">
+            💡 <strong>Login required:</strong> Please log in to start an interview and save your progress.
+          </p>
+        </div>
+      )}
+      
       <div>
         <label htmlFor="bio" className="block mb-2 font-medium text-gray-300">
           Bio

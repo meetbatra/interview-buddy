@@ -1,10 +1,33 @@
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import useInterviewStore from '../stores/interviewStore';
 import { useInterviewLogic } from '../hooks/useInterviewLogic';
 import TerminalHeader from '../components/interview/TerminalHeader';
 import ChatMessages from '../components/interview/ChatMessages';
 import TerminalControls from '../components/interview/TerminalControls';
 import ExitConfirmationDialog from '../components/interview/ExitConfirmationDialog';
 
-const InterviewPage = ({ sessionId, firstQuestion, firstQuestionAudioUrl, onClose }) => {
+const InterviewPage = () => {
+  const navigate = useNavigate();
+  const { sessionId, firstQuestion, firstQuestionAudioUrl, clearSession } = useInterviewStore();
+
+  // Redirect if no session data
+  useEffect(() => {
+    if (!sessionId || !firstQuestion) {
+      navigate('/');
+      return;
+    }
+  }, [sessionId, firstQuestion, navigate]);
+
+  const handleClose = (isCompleted = false) => {
+    if (isCompleted) {
+      navigate('/report');
+    } else {
+      clearSession();
+      navigate('/');
+    }
+  };
+
   const {
     // State
     messages,
@@ -22,14 +45,13 @@ const InterviewPage = ({ sessionId, firstQuestion, firstQuestionAudioUrl, onClos
     messagesEndRef,
     
     // Functions
-    handleClose,
     confirmExit,
     cancelExit,
     startRecording,
     stopRecording,
     stopTTS,
     formatTime
-  } = useInterviewLogic(sessionId, firstQuestion, firstQuestionAudioUrl, onClose);
+  } = useInterviewLogic(sessionId, firstQuestion, firstQuestionAudioUrl, handleClose);
 
   return (
     <div 

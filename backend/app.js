@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 const chalk = require('chalk');
 const interviewRoutes = require('./routes/interview');
+const authRoutes = require('./routes/auth');
 
 dotenv.config();
 
@@ -14,6 +15,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.use('/api/auth', authRoutes);
 app.use('/api/interview', interviewRoutes);
 
 const PORT = process.env.PORT || 8080;
