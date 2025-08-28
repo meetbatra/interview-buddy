@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../stores/authStore';
 import useInterviewStore from '../stores/interviewStore';
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { getReport } from '../api/interviewApi';
 import SummaryCard from '../components/report/SummaryCard';
@@ -112,24 +113,43 @@ const ReportPage = () => {
         </div>
 
         {/* Report Content */}
-        <div className="space-y-6 pb-6">
-          {/* Summary */}
-          {reportData?.summary && <SummaryCard summary={reportData.summary} />}
-
-          {/* Scorecard */}
-          {reportData?.scores && <Scorecard scores={reportData.scores} />}
-
-          {/* Strengths & Weaknesses */}
-          {(reportData?.strengths || reportData?.weaknesses) && (
-            <StrengthWeakness 
-              strengths={reportData?.strengths} 
-              weaknesses={reportData?.weaknesses} 
-            />
-          )}
-
-          {/* Conversation History */}
-          {reportData?.messages && <ConversationHistory messages={reportData.messages} />}
-        </div>
+        <Tabs defaultValue="summary" className="pb-6">
+          <TabsList className="grid w-full grid-cols-4 bg-white/10 backdrop-blur-md border-white/20">
+            <TabsTrigger value="summary" className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white">
+              Summary
+            </TabsTrigger>
+            <TabsTrigger value="scores" className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white">
+              Scores
+            </TabsTrigger>
+            <TabsTrigger value="feedback" className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white">
+              Feedback
+            </TabsTrigger>
+            <TabsTrigger value="conversation" className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white">
+              History
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="summary" className="mt-6">
+            {reportData?.summary && <SummaryCard summary={reportData.summary} />}
+          </TabsContent>
+          
+          <TabsContent value="scores" className="mt-6">
+            {reportData?.scores && <Scorecard scores={reportData.scores} />}
+          </TabsContent>
+          
+          <TabsContent value="feedback" className="mt-6">
+            {(reportData?.strengths || reportData?.weaknesses) && (
+              <StrengthWeakness 
+                strengths={reportData?.strengths} 
+                weaknesses={reportData?.weaknesses} 
+              />
+            )}
+          </TabsContent>
+          
+          <TabsContent value="conversation" className="mt-6">
+            {reportData?.messages && <ConversationHistory messages={reportData.messages} />}
+          </TabsContent>
+        </Tabs>
 
         {/* Footer */}
         <div className="mt-8 text-center text-gray-400 text-sm">

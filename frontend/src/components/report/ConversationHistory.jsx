@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { MessageCircle, User, Bot } from "lucide-react";
 
 const MessageItem = ({ message, index }) => {
@@ -9,11 +10,13 @@ const MessageItem = ({ message, index }) => {
 
   return (
     <div className={`flex gap-3 ${isAnswer ? 'flex-row-reverse' : ''}`}>
-      <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-        isQuestion ? 'bg-blue-500/20 text-blue-400' : 'bg-green-500/20 text-green-400'
-      }`}>
-        {isQuestion ? <Bot className="w-4 h-4" /> : <User className="w-4 h-4" />}
-      </div>
+      <Avatar className="flex-shrink-0 w-8 h-8">
+        <AvatarFallback className={`${
+          isQuestion ? 'bg-blue-500/20 text-blue-400' : 'bg-green-500/20 text-green-400'
+        }`}>
+          {isQuestion ? <Bot className="w-4 h-4" /> : <User className="w-4 h-4" />}
+        </AvatarFallback>
+      </Avatar>
       
       <div className={`max-w-[80%] ${isAnswer ? 'text-right' : ''}`}>
         <div className={`inline-block p-3 rounded-lg ${

@@ -1,4 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
 import { TrendingUp, MessageSquare, Zap } from "lucide-react";
 
 const ScoreItem = ({ icon: Icon, label, score, maxScore = 10, color }) => {
@@ -13,18 +15,24 @@ const ScoreItem = ({ icon: Icon, label, score, maxScore = 10, color }) => {
         <span className="font-medium text-white">{label}</span>
       </div>
       <div className="flex items-center gap-3">
-        <div className="w-24 bg-white/20 rounded-full h-2">
-          <div 
-            className={`h-2 rounded-full transition-all duration-500 ${
-              percentage >= 80 ? 'bg-green-400' : 
-              percentage >= 60 ? 'bg-yellow-400' : 'bg-red-400'
-            }`}
-            style={{ width: `${Math.min(percentage, 100)}%` }}
-          />
-        </div>
-        <span className="font-bold text-lg min-w-[3rem] text-center text-white">
+        <Progress 
+          value={percentage} 
+          className="w-24 h-2 bg-white/20"
+          style={{
+            '--progress-background': percentage >= 80 ? '#4ade80' : 
+                                   percentage >= 60 ? '#facc15' : '#f87171'
+          }}
+        />
+        <Badge 
+          variant="secondary" 
+          className={`font-bold min-w-[3rem] text-center ${
+            percentage >= 80 ? 'bg-green-500/20 text-green-400 border-green-400/50' : 
+            percentage >= 60 ? 'bg-yellow-500/20 text-yellow-400 border-yellow-400/50' : 
+            'bg-red-500/20 text-red-400 border-red-400/50'
+          }`}
+        >
           {score}/{maxScore}
-        </span>
+        </Badge>
       </div>
     </div>
   );
@@ -71,9 +79,12 @@ const Scorecard = ({ scores }) => {
         <div className="mt-6 p-4 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-lg border border-blue-400/30">
           <div className="flex items-center justify-between">
             <span className="text-lg font-semibold text-white">Overall Score</span>
-            <span className="text-2xl font-bold text-blue-400">
+            <Badge 
+              variant="outline" 
+              className="text-2xl font-bold text-blue-400 border-blue-400/50 bg-blue-500/10 px-4 py-2"
+            >
               {Math.round((finalScores.technical + finalScores.communication + finalScores.confidence) / 3 * 10) / 10}/10
-            </span>
+            </Badge>
           </div>
         </div>
       </CardContent>

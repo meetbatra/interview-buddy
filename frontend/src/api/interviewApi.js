@@ -1,10 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: `${import.meta.env.VITE_API_URL}/interview`,
-  headers: {
-    'Content-Type': 'application/json'
-  }
+  baseURL: `${import.meta.env.VITE_API_URL}/interview`
 });
 
 export const startInterview = (resume, bio, token) => {
@@ -14,6 +11,7 @@ export const startInterview = (resume, bio, token) => {
   return api.post('/start', formData, {
     headers: {
       'Authorization': `Bearer ${token}`
+      // Don't set Content-Type - let browser set it for FormData
     }
   });
 };
@@ -24,7 +22,8 @@ export const getNextQuestion = (sessionId, answer, questionIndex, token) => {
     questionIndex
   }, {
     headers: {
-      'Authorization': `Bearer ${token}`
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
     }
   });
 };

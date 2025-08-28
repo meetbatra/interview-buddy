@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Mic, MicOff, Volume2, Brain } from 'lucide-react';
+import { Mic, MicOff, Volume2, Brain, Send } from 'lucide-react';
 
 const TerminalControls = ({ 
   isVisible,
@@ -12,7 +12,8 @@ const TerminalControls = ({
   onStopTTS,
   onStartRecording,
   onStopRecording,
-  onClose
+  onClose,
+  onViewReport
 }) => {
   return (
     <div className={`border-t border-gray-600 bg-gray-800/50 p-4 transition-all duration-700 ease-out ${
@@ -87,7 +88,7 @@ const TerminalControls = ({
         {/* Interview Complete */}
         {isInterviewComplete && (
           <Button 
-            onClick={onClose}
+            onClick={onViewReport}
             className="bg-blue-600/20 border border-blue-500 text-blue-400 hover:bg-blue-600/30 font-mono"
           >
             ./view_summary.sh

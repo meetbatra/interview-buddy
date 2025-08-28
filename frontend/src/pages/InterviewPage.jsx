@@ -50,7 +50,8 @@ const InterviewPage = () => {
     startRecording,
     stopRecording,
     stopTTS,
-    formatTime
+    formatTime,
+    viewReport
   } = useInterviewLogic(sessionId, firstQuestion, firstQuestionAudioUrl, handleClose);
 
   return (
@@ -102,6 +103,7 @@ const InterviewPage = () => {
           onStartRecording={startRecording}
           onStopRecording={stopRecording}
           onClose={handleClose}
+          onViewReport={viewReport}
         />
       </div>
 

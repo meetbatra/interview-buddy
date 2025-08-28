@@ -41,7 +41,7 @@ module.exports.startInterview = async (req, res) => {
     const audioUrl = await murfService.generateSpeech(firstQuestion);
     
     const session = new InterviewSession({
-      userId: req.user.id, // Store the authenticated user's ID
+      userId: req.user._id, // Use _id instead of id
       resumeText: resumeSummary.join(' '),
       bio,
       conversation: [{ role: 'ai', message: firstQuestion }],
@@ -80,7 +80,7 @@ module.exports.getNextQuestion = async (req, res) => {
     }
 
     // Verify that the session belongs to the authenticated user
-    if (session.userId.toString() !== req.user.id) {
+    if (session.userId.toString() !== req.user._id.toString()) {
       return res.status(403).json({ error: 'Access denied. This session does not belong to you.' });
     }
 
@@ -163,7 +163,7 @@ module.exports.getReport = async (req, res) => {
     }
 
     // Verify that the session belongs to the authenticated user
-    if (session.userId.toString() !== req.user.id) {
+    if (session.userId.toString() !== req.user._id.toString()) {
       return res.status(403).json({ error: 'Access denied. This session does not belong to you.' });
     }
 

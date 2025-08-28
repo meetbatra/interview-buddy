@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import useAuthStore from "../../stores/authStore";
 import useInterviewStore from "../../stores/interviewStore";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Info } from "lucide-react";
 import { startInterview } from "../../api/interviewApi";
 
 const BioForm = ({
@@ -20,20 +23,19 @@ const BioForm = ({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
 
     // Check if user is authenticated
     if (!isAuthenticated) {
-      setError("Please log in to start an interview.");
+      toast.error("Please log in to start an interview.");
       return;
     }
 
     if (!resumeFile) {
-      setError("Please upload your resume.");
+      toast.error("Please upload your resume.");
       return;
     }
     if (!bio || bio.trim() === "") {
-      setError("Please enter your bio.");
+      toast.error("Please enter your bio.");
       return;
     }
     setLoading(true);
@@ -49,17 +51,28 @@ const BioForm = ({
           result.data.audioUrl || ''
         );
         
+        toast.success("Interview started successfully!");
+        
         // Navigate to interview page
         navigate('/interview');
       } else {
-        setError("Failed to start interview. Please try again.");
+        toast.error("Failed to start interview. Please try again.");
       }
     } catch (err) {
       console.error('Interview start error:', err);
+      console.error('Error response:', err.response);
+      console.error('Error message:', err.message);
+      
       if (err.response?.status === 401) {
-        setError("Authentication required. Please log in again.");
+        toast.error("Authentication required. Please log in again.");
+      } else if (err.response?.status === 400) {
+        toast.error(err.response?.data?.error || "Invalid request. Please check your resume and bio.");
+      } else if (err.response?.status === 500) {
+        toast.error("Server error. Please try again later.");
+      } else if (err.code === 'NETWORK_ERROR' || !err.response) {
+        toast.error("Network error. Please check your connection and try again.");
       } else {
-        setError("Error starting interview. Please try again.");
+        toast.error(err.response?.data?.error || "Error starting interview. Please try again.");
       }
     } finally {
       setLoading(false);
@@ -70,11 +83,12 @@ const BioForm = ({
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Authentication notice for non-logged in users */}
       {!isAuthenticated && (
-        <div className="p-3 mb-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-          <p className="text-blue-300 text-sm">
-            💡 <strong>Login required:</strong> Please log in to start an interview and save your progress.
-          </p>
-        </div>
+        <Alert className="bg-blue-500/10 border-blue-500/20 text-blue-300">
+          <Info className="h-4 w-4" />
+          <AlertDescription>
+            <strong>Login required:</strong> Please log in to start an interview and save your progress.
+          </AlertDescription>
+        </Alert>
       )}
       
       <div>
@@ -90,7 +104,6 @@ const BioForm = ({
           className="bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-blue-400"
         />
       </div>
-      {error && <div className="text-red-400 text-sm">{error}</div>}
       <Button 
         type="submit" 
         disabled={loading}

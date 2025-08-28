@@ -1,26 +1,33 @@
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 const ExitConfirmationDialog = ({ show, onConfirm, onCancel }) => {
-  if (!show) return null;
-
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
-      <div className="bg-gray-800/95 backdrop-blur-sm rounded-lg border border-red-500/50 shadow-2xl max-w-md w-full p-6 animate-in fade-in scale-in-95 duration-200">
-        {/* Dialog Header */}
-        <div className="flex items-center space-x-3 mb-4">
-          <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-          <h3 className="text-red-400 font-mono text-lg">⚠️ Exit Interview?</h3>
-        </div>
+    <Dialog open={show} onOpenChange={onCancel}>
+      <DialogContent className="bg-gray-800/95 backdrop-blur-sm border-red-500/50 shadow-2xl text-white max-w-md">
+        <DialogHeader className="space-y-3">
+          <div className="flex items-center space-x-3">
+            <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+            <DialogTitle className="text-red-400 font-mono text-lg">⚠️ Exit Interview?</DialogTitle>
+          </div>
+        </DialogHeader>
         
-        {/* Dialog Content */}
-        <div className="text-gray-300 font-mono text-sm space-y-3 mb-6">
-          <p className="text-yellow-400">$ warning: interview session in progress</p>
-          <p>If you exit now, you'll lose all current progress and will need to start over from the beginning.</p>
-          <p className="text-blue-400">Continue with the interview to save your progress.</p>
-        </div>
+        <DialogDescription asChild>
+          <div className="text-gray-300 font-mono text-sm space-y-3">
+            <p className="text-yellow-400">$ warning: interview session in progress</p>
+            <p>If you exit now, you'll lose all current progress and will need to start over from the beginning.</p>
+            <p className="text-blue-400">Continue with the interview to save your progress.</p>
+          </div>
+        </DialogDescription>
         
-        {/* Dialog Actions */}
-        <div className="flex space-x-3 justify-end">
+        <DialogFooter className="flex space-x-3 justify-end">
           <Button 
             onClick={onCancel}
             variant="outline"
@@ -34,9 +41,9 @@ const ExitConfirmationDialog = ({ show, onConfirm, onCancel }) => {
           >
             Exit & Start Over
           </Button>
-        </div>
-      </div>
-    </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 

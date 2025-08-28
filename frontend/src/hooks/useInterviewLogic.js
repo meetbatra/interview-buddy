@@ -6,7 +6,7 @@ export const useInterviewLogic = (sessionId, firstQuestion, firstQuestionAudioUr
   // Get auth token
   const { token } = useAuthStore();
   
-  // State management
+  // State management - Reverted to original approach
   const [messages, setMessages] = useState([]);
   const [isRecording, setIsRecording] = useState(false);
   const [isMicEnabled, setIsMicEnabled] = useState(false);
@@ -100,7 +100,12 @@ export const useInterviewLogic = (sessionId, firstQuestion, firstQuestionAudioUr
   useEffect(() => {
     if (firstQuestion && !hasPlayedFirstQuestion.current) {
       hasPlayedFirstQuestion.current = true;
-      setMessages([{ type: 'question', text: firstQuestion, timestamp: new Date() }]);
+      setMessages([{ 
+        id: `msg-${Date.now()}-first-question`,
+        type: 'question', 
+        text: firstQuestion, 
+        timestamp: new Date() 
+      }]);
       speakQuestion(firstQuestion, firstQuestionAudioUrl);
     }
   }, [firstQuestion]);
@@ -127,10 +132,12 @@ export const useInterviewLogic = (sessionId, firstQuestion, firstQuestionAudioUr
       recognitionRef.current.onerror = (event) => {
         console.error('Speech recognition error:', event.error);
         setIsRecording(false);
+        setIsMicEnabled(true);
       };
 
       recognitionRef.current.onend = () => {
         setIsRecording(false);
+        setIsMicEnabled(true);
       };
     }
 
@@ -199,7 +206,7 @@ export const useInterviewLogic = (sessionId, firstQuestion, firstQuestionAudioUr
 
   const handleUserResponse = async (transcript) => {
     const userMessage = {
-      id: messages.length + 1,
+      id: `msg-${Date.now()}-user`,
       type: 'answer',
       text: transcript,
       timestamp: new Date()
@@ -213,19 +220,31 @@ export const useInterviewLogic = (sessionId, firstQuestion, firstQuestionAudioUr
 
       if (data.success) {
         if (data.isComplete) {
-          setIsInterviewComplete(true);
           setIsProcessingResponse(false);
           const completionMessage = {
-            id: messages.length + 2,
+            id: `msg-${Date.now()}-completion`,
             type: 'system',
-            text: "Interview completed! Thank you for your responses.",
+            text: "Thank you for your time! You can see your results by clicking the button at the bottom right of this dialog.",
             timestamp: new Date()
           };
           setMessages(prev => [...prev, completionMessage]);
+          
+          // Play completion message with Murf TTS
+          setTimeout(() => {
+            speakQuestion(
+              "Thank you for your time! You can see your results by clicking the button at the bottom right of this dialog.",
+              null // No audio URL, will use text-to-speech
+            );
+            
+            // Set interview complete after a short delay to allow the message to play
+            setTimeout(() => {
+              setIsInterviewComplete(true);
+            }, 3000);
+          }, 500);
         } else {
           setIsProcessingResponse(false);
           const nextQuestion = {
-            id: messages.length + 2,
+            id: `msg-${Date.now()}-question`,
             type: 'question',
             text: data.nextQuestion,
             timestamp: new Date()
@@ -242,7 +261,7 @@ export const useInterviewLogic = (sessionId, firstQuestion, firstQuestionAudioUr
       console.error('Error getting next question:', error);
       setIsProcessingResponse(false);
       const errorMessage = {
-        id: messages.length + 2,
+        id: `msg-${Date.now()}-error`,
         type: 'system',
         text: "Sorry, there was an error. Please try again.",
         timestamp: new Date()
@@ -253,16 +272,17 @@ export const useInterviewLogic = (sessionId, firstQuestion, firstQuestionAudioUr
   };
 
   const startRecording = () => {
-    if (recognitionRef.current && !isRecording) {
+    if (recognitionRef.current && !isRecording && isMicEnabled) {
       setIsRecording(true);
+      setIsMicEnabled(false);
       recognitionRef.current.start();
     }
   };
 
   const stopRecording = () => {
     if (recognitionRef.current && isRecording) {
-      recognitionRef.current.stop();
       setIsRecording(false);
+      recognitionRef.current.stop();
     }
   };
 

@@ -1,6 +1,9 @@
 import { useRef, useState } from "react";
+import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Upload, FileCheck, AlertTriangle } from "lucide-react";
 
 const ResumeUpload = ({ setResumeFile }) => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -35,17 +38,22 @@ const ResumeUpload = ({ setResumeFile }) => {
     setError(''); // Clear any previous errors
     
     if (!validateFileType(file)) {
-      setError('Please upload only PDF files.');
+      const errorMsg = 'Please upload only PDF files.';
+      setError(errorMsg);
+      toast.error(errorMsg);
       return;
     }
     
     if (!validateFileSize(file)) {
-      setError(`File size must be less than 5MB. Your file is ${formatFileSize(file.size)}.`);
+      const errorMsg = `File size must be less than 5MB. Your file is ${formatFileSize(file.size)}.`;
+      setError(errorMsg);
+      toast.error(errorMsg);
       return;
     }
     
     setSelectedFile(file);
     setResumeFile(file);
+    toast.success(`Resume uploaded successfully: ${file.name}`);
   };
 
   const handleFileChange = (e) => {
@@ -83,39 +91,50 @@ const ResumeUpload = ({ setResumeFile }) => {
   };
 
   return (
-    <div
-      onDragOver={handleDragOver}
-      onDragLeave={handleDragLeave}
-      onDrop={handleDrop}
-      className={`border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center transition-colors h-[10rem] ${
-        dragActive 
-          ? "border-blue-400 bg-blue-400 bg-opacity-10" 
-          : "border-gray-600 hover:border-gray-500"
-      }`}
-      style={{ cursor: "pointer" }}
-      tabIndex={0}
-      onClick={handleClick}
-    >
-      <Input
-        ref={inputRef}
-        type="file"
-        accept=".pdf"
-        className="hidden"
-        onChange={handleFileChange}
-        data-testid="resume-input"
-      />
-      <div className="flex flex-col items-center justify-center gap-2">
-        <span className="text-gray-300 text-sm">
+    <div className="space-y-4">
+      <div
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+        className={`border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center transition-colors h-[10rem] ${
+          dragActive 
+            ? "border-blue-400 bg-blue-400 bg-opacity-10" 
+            : "border-gray-600 hover:border-gray-500"
+        }`}
+        style={{ cursor: "pointer" }}
+        tabIndex={0}
+        onClick={handleClick}
+      >
+        <Input
+          ref={inputRef}
+          type="file"
+          accept=".pdf"
+          className="hidden"
+          onChange={handleFileChange}
+          data-testid="resume-input"
+        />
+        <div className="flex flex-col items-center justify-center gap-2">
           {selectedFile ? (
-            <>Selected: <span className="font-medium text-white">{selectedFile.name}</span></>
+            <FileCheck className="w-8 h-8 text-green-400 mb-2" />
           ) : (
-            <>Drag &amp; drop your PDF resume</>
+            <Upload className="w-8 h-8 text-gray-400 mb-2" />
           )}
-        </span>
-        {error && (
-          <span className="text-red-400 text-xs mt-1">{error}</span>
-        )}
+          <span className="text-gray-300 text-sm text-center">
+            {selectedFile ? (
+              <>Selected: <span className="font-medium text-white">{selectedFile.name}</span></>
+            ) : (
+              <>Drag & drop your PDF resume or click to browse</>
+            )}
+          </span>
+        </div>
       </div>
+      
+      {error && (
+        <Alert className="bg-red-500/10 border-red-500/20 text-red-300">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
     </div>
   );
 };

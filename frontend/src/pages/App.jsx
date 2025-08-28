@@ -1,4 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
+import { Toaster } from "@/components/ui/sonner";
 import AnimatedBackground from '../components/shared/AnimatedBackground';
 import Header from '../components/shared/Header';
 import Footer from '../components/shared/Footer';
@@ -46,6 +47,19 @@ function App() {
       
       {/* Sticky Footer */}
       <Footer />
+      
+      {/* Toast Notifications */}
+      <Toaster 
+        position="top-center"
+        toastOptions={{
+          style: {
+            background: 'rgba(255, 255, 255, 0.1)',
+            backdropFilter: 'blur(12px)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            color: 'white',
+          },
+        }}
+      />
     </div>
   );
 }
