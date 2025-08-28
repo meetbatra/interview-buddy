@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import useAuthStore from '../stores/authStore';
-import { userApi } from '../api/userApi';
+import { signup } from '../api/userApi';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
+import GoogleLoginButton from '../components/auth/GoogleLoginButton';
 
 const SignupPage = () => {
   const [username, setUsername] = useState('');
@@ -11,9 +12,10 @@ const SignupPage = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   
-  const { isLoading, isAuthenticated } = useAuthStore();
+  const { isAuthenticated, login } = useAuthStore();
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -41,13 +43,20 @@ const SignupPage = () => {
       return;
     }
 
-    const result = await userApi.signup(username, email, password);
-    
-    if (result.success) {
-      navigate('/');
-    } else {
-      setError(result.error);
+    setIsLoading(true);
+    try {
+      const response = await signup(username, email, password);
+      
+      if (response.data.success) {
+        login({ user: response.data.data.user, token: response.data.data.token });
+        navigate('/');
+      } else {
+        setError(response.data.message);
+      }
+    } catch (error) {
+      setError(error.response?.data?.message || 'Network error. Please try again.');
     }
+    setIsLoading(false);
   };
 
   return (
@@ -127,11 +136,26 @@ const SignupPage = () => {
             <Button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-white/20 hover:bg-white/30 text-white border border-white/30 disabled:opacity-50"
+              className="w-full bg-white/20 hover:bg-white/30 text-white border border-white/30 disabled:opacity-50 cursor-pointer"
             >
               {isLoading ? 'Creating account...' : 'Create Account'}
             </Button>
           </form>
+
+          {/* Divider */}
+          <div className="mt-6 mb-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-white/20"></div>
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-transparent px-2 text-white/60">Or continue with</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Google Login Button */}
+          <GoogleLoginButton />
 
           <div className="mt-8 text-center">
             <p className="text-white/60">

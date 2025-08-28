@@ -1,4 +1,6 @@
 const User = require('../models/user');
+const bcrypt = require('bcryptjs');
+const axios = require('axios');
 const { generateToken } = require('../utils/jwt');
 
 // Signup controller
@@ -27,11 +29,15 @@ module.exports.signup = async (req, res) => {
       });
     }
 
+    // Hash password
+    const salt = await bcrypt.genSalt(12);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
     // Create new user
     const user = new User({
       username,
       email,
-      password
+      password: hashedPassword
     });
 
     await user.save();
@@ -150,6 +156,100 @@ module.exports.getMe = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Internal server error'
+    });
+  }
+};
+
+// Google OAuth login (Access Token approach)
+module.exports.googleLogin = async (req, res) => {
+  try {
+    const { token } = req.body;
+
+    if (!token) {
+      return res.status(400).json({
+        success: false,
+        message: 'Access token is required'
+      });
+    }
+
+    // Verify access token by fetching user info from Google
+    const response = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const { email, name, email_verified } = response.data;
+
+    // Check if email is verified by Google
+    if (!email_verified) {
+      return res.status(400).json({
+        success: false,
+        message: 'Google email not verified'
+      });
+    }
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Unable to get user information from Google'
+      });
+    }
+
+    // Simple user lookup/creation
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      user = new User({
+        username: name || email.split('@')[0],
+        email,
+        password: 'google_oauth_' + Date.now(), // Random password for OAuth users
+        isGoogleUser: true
+      });
+      await user.save({ validateBeforeSave: false });
+    }
+
+    // Generate auth token
+    const authToken = generateToken(user._id);
+
+    // Update last login
+    user.lastLogin = new Date();
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Google login successful',
+      data: {
+        token: authToken,
+        user: {
+          _id: user._id,
+          username: user.username,
+          email: user.email,
+        },
+      }
+    });
+
+  } catch (error) {
+    console.error('Google login error:', error);
+    
+    // Handle specific Google API errors
+    if (error.response?.status === 401) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid or expired Google access token'
+      });
+    }
+
+    if (error.response?.status === 403) {
+      return res.status(403).json({
+        success: false,
+        message: 'Google API access forbidden'
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      message: 'Google login failed. Please try again.'
     });
   }
 };

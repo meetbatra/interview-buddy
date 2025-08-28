@@ -7,9 +7,6 @@ const useAuthStore = create(
       user: null,
       token: null,
       isAuthenticated: false,
-      isLoading: false,
-
-      setLoading: (loading) => set({ isLoading: loading }),
 
       login: ({ user, token }) => {
         localStorage.setItem('token', token);

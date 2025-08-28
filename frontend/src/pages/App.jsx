@@ -1,5 +1,4 @@
 import { Routes, Route } from 'react-router-dom';
-import useAuthStore from '../stores/authStore';
 import AnimatedBackground from '../components/shared/AnimatedBackground';
 import Header from '../components/shared/Header';
 import Footer from '../components/shared/Footer';
@@ -10,19 +9,6 @@ import InterviewPage from './InterviewPage';
 import ReportPage from './ReportPage';
 
 function App() {
-  const { isLoading } = useAuthStore();
-
-  // Show loading screen while checking authentication
-  if (isLoading) {
-    return (
-      <div className="h-screen relative flex flex-col">
-        <AnimatedBackground />
-        <div className="relative z-10 flex-1 flex items-center justify-center">
-          <div className="text-white text-xl">Loading...</div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen relative flex flex-col">

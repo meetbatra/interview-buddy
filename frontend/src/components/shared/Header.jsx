@@ -22,7 +22,7 @@ const Header = () => {
         <Link to="/" className="text-white md:text-3xl text-xl font-bold tracking-wide hover:text-gray-300 transition-colors">
           INTERVIEW BUDDY
         </Link>
-        <div className="absolute top-4 right-6 flex items-center space-x-4">
+        <div className="absolute top-4 right-6 z-25 flex items-center space-x-4">
           {isAuthenticated ? (
             <div className="relative">
               <Button
@@ -83,7 +83,7 @@ const Header = () => {
       {/* Close user menu when clicking outside */}
       {showUserMenu && (
         <div
-          className="fixed inset-0 z-5"
+          className="fixed inset-0 z-20"
           onClick={() => setShowUserMenu(false)}
         />
       )}
