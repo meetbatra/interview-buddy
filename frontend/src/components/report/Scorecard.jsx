@@ -7,32 +7,34 @@ const ScoreItem = ({ icon: Icon, label, score, maxScore = 10, color }) => {
   const percentage = (score / maxScore) * 100;
   
   return (
-    <div className="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-white/10">
-      <div className="flex items-center gap-3">
-        <div className={`p-2 rounded-full ${color}`}>
-          <Icon className="w-5 h-5 text-white" />
+    <div className="p-4 bg-white/5 rounded-lg border border-white/10">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className={`p-2 rounded-full ${color}`}>
+            <Icon className="w-5 h-5 text-white" />
+          </div>
+          <span className="font-medium text-white">{label}</span>
         </div>
-        <span className="font-medium text-white">{label}</span>
-      </div>
-      <div className="flex items-center gap-3">
-        <Progress 
-          value={percentage} 
-          className="w-24 h-2 bg-white/20"
-          style={{
-            '--progress-background': percentage >= 80 ? '#4ade80' : 
-                                   percentage >= 60 ? '#facc15' : '#f87171'
-          }}
-        />
-        <Badge 
-          variant="secondary" 
-          className={`font-bold min-w-[3rem] text-center ${
-            percentage >= 80 ? 'bg-green-500/20 text-green-400 border-green-400/50' : 
-            percentage >= 60 ? 'bg-yellow-500/20 text-yellow-400 border-yellow-400/50' : 
-            'bg-red-500/20 text-red-400 border-red-400/50'
-          }`}
-        >
-          {score}/{maxScore}
-        </Badge>
+        <div className="flex items-center gap-3 sm:ml-auto w-full sm:w-auto">
+          <Progress 
+            value={percentage} 
+            className="flex-1 sm:w-24 h-2 bg-white/20"
+            style={{
+              '--progress-background': percentage >= 80 ? '#4ade80' : 
+                                     percentage >= 60 ? '#facc15' : '#f87171'
+            }}
+          />
+          <Badge 
+            variant="secondary" 
+            className={`font-bold min-w-[3rem] text-center ${
+              percentage >= 80 ? 'bg-green-500/20 text-green-400 border-green-400/50' : 
+              percentage >= 60 ? 'bg-yellow-500/20 text-yellow-400 border-yellow-400/50' : 
+              'bg-red-500/20 text-red-400 border-red-400/50'
+            }`}
+          >
+            {score}/{maxScore}
+          </Badge>
+        </div>
       </div>
     </div>
   );

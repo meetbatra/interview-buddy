@@ -11,11 +11,7 @@ const useInterviewStore = create((set, get) => ({
     set({ sessionId, firstQuestion, firstQuestionAudioUrl }),
   
   clearSession: () => 
-    set({ sessionId: null, firstQuestion: '', firstQuestionAudioUrl: '' }),
-  
-  // Demo session
-  setDemoSession: () => 
-    set({ sessionId: '68ab36cb2607973454fa10af' })
+    set({ sessionId: null, firstQuestion: '', firstQuestionAudioUrl: '' })
 }));
 
 export default useInterviewStore;

@@ -19,7 +19,7 @@ const InterviewPage = () => {
     }
   }, [sessionId, firstQuestion, navigate]);
 
-  const handleClose = (isCompleted = false) => {
+  const handleNavigation = (isCompleted = false) => {
     if (isCompleted) {
       navigate('/report');
     } else {
@@ -45,6 +45,7 @@ const InterviewPage = () => {
     messagesEndRef,
     
     // Functions
+    handleClose,
     confirmExit,
     cancelExit,
     startRecording,
@@ -52,7 +53,7 @@ const InterviewPage = () => {
     stopTTS,
     formatTime,
     viewReport
-  } = useInterviewLogic(sessionId, firstQuestion, firstQuestionAudioUrl, handleClose);
+  } = useInterviewLogic(sessionId, firstQuestion, firstQuestionAudioUrl, handleNavigation);
 
   return (
     <div 
@@ -102,7 +103,7 @@ const InterviewPage = () => {
           onStopTTS={stopTTS}
           onStartRecording={startRecording}
           onStopRecording={stopRecording}
-          onClose={handleClose}
+          onClose={handleNavigation}
           onViewReport={viewReport}
         />
       </div>

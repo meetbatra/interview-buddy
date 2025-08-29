@@ -8,6 +8,7 @@ import LoginPage from './LoginPage';
 import SignupPage from './SignupPage';
 import InterviewPage from './InterviewPage';
 import ReportPage from './ReportPage';
+import DashboardPage from './DashboardPage';
 
 function App() {
 
@@ -37,6 +38,11 @@ function App() {
             </div>
           } />
           <Route path="/interview" element={<InterviewPage />} />
+          <Route path="/dashboard" element={
+            <div className="flex-1 overflow-y-auto">
+              <DashboardPage />
+            </div>
+          } />
           <Route path="/report" element={
             <div className="flex-1 overflow-y-auto">
               <ReportPage />

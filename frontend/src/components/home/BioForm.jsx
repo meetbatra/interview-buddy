@@ -42,7 +42,6 @@ const BioForm = ({
     try {
       const result = await startInterview(resumeFile, bio, token);
       if (result && result.data.sessionId && result.data.firstQuestion) {
-        console.log(result.data);
         
         // Store session data in Zustand store
         setSessionData(

@@ -26,14 +26,16 @@ const TerminalHeader = ({
         }`}>
           {isInterviewComplete ? 'Interview Complete ✓' : `Question ${currentQuestionIndex + 1}/10`}
         </span>
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={onClose}
-          className="text-gray-400 hover:text-red-400 transition-colors font-mono"
-        >
-          exit
-        </Button>
+        {!isInterviewComplete && (
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={onClose}
+            className="text-gray-400 hover:text-red-400 transition-colors font-mono"
+          >
+            exit
+          </Button>
+        )}
       </div>
     </div>
   );

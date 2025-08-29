@@ -73,13 +73,19 @@ const Header = () => {
             {/* Custom Dropdown Menu */}
             {isDropdownOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white/10 backdrop-blur-md border border-white/20 rounded-lg shadow-lg z-50 animate-in fade-in-0 zoom-in-95 slide-in-from-top-2 duration-200">
-                <div className="py-1">
-                  <div className="px-4 py-2 text-sm text-white/80 border-b border-white/20">
-                    {user?.email}
-                  </div>
+                <div className="">
+                  <button
+                    onClick={() => {
+                      navigate('/dashboard');
+                      setIsDropdownOpen(false);
+                    }}
+                    className="w-full text-left px-4 py-3 text-sm text-white hover:bg-white/10 border-b border-white/20 transition-colors cursor-pointer"
+                  >
+                    Dashboard
+                  </button>
                   <button
                     onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 text-sm text-white hover:bg-white/10 transition-colors cursor-pointer"
+                    className="w-full text-left px-4 py-3 text-sm text-white hover:bg-white/10 rounded-b-lg transition-colors cursor-pointer"
                   >
                     Logout
                   </button>

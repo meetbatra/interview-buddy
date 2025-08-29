@@ -96,15 +96,17 @@ const TerminalControls = ({
         )}
       </div>
       
-      <div className="text-center mt-3 text-xs text-gray-500 font-mono">
-        {!isInterviewComplete && (
-          isMicEnabled 
-            ? "$ press [SPACE] or click mic to record response" 
-            : isAudioPlaying
-            ? "$ audio stream active... please wait"
-            : "$ initializing next prompt..."
-        )}
-      </div>
+              <div className="text-center mt-3 text-xs text-gray-500 font-mono">
+          {!isInterviewComplete && (
+            isMicEnabled 
+              ? isRecording
+                ? "$ recording... click mic or press [SPACE] to stop and send"
+                : "$ click mic or press [SPACE] to start recording" 
+              : isAudioPlaying
+              ? "$ audio stream active... please wait"
+              : "$ initializing next prompt..."
+          )}
+        </div>
     </div>
   );
 };

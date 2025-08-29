@@ -100,7 +100,7 @@ const ReportPage = () => {
             <Button 
               onClick={handleBack} 
               variant="outline"
-              className="flex items-center gap-2 bg-white/10 backdrop-blur-md border-white/20 text-white hover:bg-white/20 hover:border-white/30 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
+              className="flex items-center gap-2 bg-white/10 backdrop-blur-md border-white/20 text-white hover:bg-white/20 hover:border-white/30 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 cursor-pointer"
             >
               <ArrowLeft className="w-4 h-4" />
               Back

@@ -5,6 +5,7 @@ const connectDB = require('./config/db');
 const chalk = require('chalk');
 const interviewRoutes = require('./routes/interview');
 const authRoutes = require('./routes/auth');
+const dashboardRoutes = require('./routes/dashboard');
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ app.use(express.json());
 
 app.use('/api/auth', authRoutes);
 app.use('/api/interview', interviewRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 const PORT = process.env.PORT || 8080;
 
