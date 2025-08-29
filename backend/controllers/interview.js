@@ -1,6 +1,7 @@
 const { parseResume } = require("../services/pdfService");
 const { generateContent } = require("../services/geminiService");
-const murfService = require("../services/murffService");
+const { generateSpeech } = require("../services/murffService");
+const { transcribeAudio } = require("../services/speechToTextService");
 const InterviewSession = require("../models/interviewSession");
 const fs = require('fs');
 
@@ -22,7 +23,6 @@ module.exports.startInterview = async (req, res) => {
     // Delete the resume file after extracting text to save space
     try {
       fs.unlinkSync(resumeFile.path);
-      console.log(`Deleted resume file: ${resumeFile.path}`);
     } catch (deleteErr) {
       console.warn(`Failed to delete resume file: ${resumeFile.path}`, deleteErr);
       // Continue with the process even if file deletion fails
@@ -38,7 +38,7 @@ module.exports.startInterview = async (req, res) => {
     const { resumeSummary, firstQuestion } = parsedResponse;
     
     // Generate speech for first question
-    const audioUrl = await murfService.generateSpeech(firstQuestion);
+    const audioUrl = await generateSpeech(firstQuestion);
     
     const session = new InterviewSession({
       userId: req.user._id, // Use _id instead of id
@@ -56,6 +56,65 @@ module.exports.startInterview = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to start interview.' });
+  }
+}
+
+module.exports.transcribeAudio = async (req, res) => {
+  try {
+    // Check if user is authenticated
+    if (!req.user) {
+      return res.status(401).json({ error: 'Authentication required.' });
+    }
+
+    const { sessionId } = req.params;
+    const audioFile = req.file;
+
+    if (!sessionId) {
+      return res.status(400).json({ error: 'Session ID is required.' });
+    }
+
+    if (!audioFile) {
+      return res.status(400).json({ error: 'Audio file is required.' });
+    }
+
+    // Verify session exists and belongs to user
+    const session = await InterviewSession.findById(sessionId);
+    if (!session) {
+      return res.status(404).json({ error: 'Session not found.' });
+    }
+
+    if (session.userId.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ error: 'Access denied. This session does not belong to you.' });
+    }
+
+    // Read audio file and transcribe
+    const audioBuffer = fs.readFileSync(audioFile.path);
+    
+    const transcriptionResult = await transcribeAudio(audioBuffer);
+
+    // Clean up audio file
+    try {
+      fs.unlinkSync(audioFile.path);
+    } catch (deleteErr) {
+      console.warn(`Failed to delete audio file: ${audioFile.path}`, deleteErr);
+    }
+
+    if (!transcriptionResult.success) {
+      return res.status(500).json({ 
+        error: 'Failed to transcribe audio',
+        details: transcriptionResult.error 
+      });
+    }
+
+    res.json({
+      success: true,
+      transcript: transcriptionResult.transcript,
+      confidence: transcriptionResult.confidence
+    });
+
+  } catch (err) {
+    console.error('Error transcribing audio:', err);
+    res.status(500).json({ error: 'Failed to transcribe audio.' });
   }
 }
 
@@ -126,7 +185,7 @@ Return only the next question, nothing else.`;
     const cleanedQuestion = nextQuestion.trim();
 
     // Generate speech for next question
-    const audioUrl = await murfService.generateSpeech(cleanedQuestion);
+    const audioUrl = await generateSpeech(cleanedQuestion);
 
     // Add AI question to conversation
     session.conversation.push({ role: 'ai', message: cleanedQuestion });

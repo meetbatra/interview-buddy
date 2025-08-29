@@ -9,6 +9,10 @@ const TerminalControls = ({
   isMicEnabled,
   isInterviewComplete,
   isProcessingResponse,
+  timeRemaining,
+  isTimerActive,
+  formatTimer,
+  getTimerColor,
   onStopTTS,
   onStartRecording,
   onStopRecording,
@@ -22,6 +26,12 @@ const TerminalControls = ({
       <div className="flex items-center justify-between">
         {/* Status Bar */}
         <div className="flex items-center space-x-4 font-mono text-xs">
+          {isTimerActive && (
+            <div className={`flex items-center space-x-2 ${getTimerColor()}`}>
+              <span>timer.active:</span>
+              <span className="text-gray-300">{formatTimer(timeRemaining)}</span>
+            </div>
+          )}
           {isAudioPlaying && (
             <div className="flex items-center space-x-2 text-blue-400">
               <Volume2 className="w-4 h-4 animate-pulse" />
@@ -67,11 +77,11 @@ const TerminalControls = ({
             <Button
               size="lg"
               onClick={isRecording ? onStopRecording : onStartRecording}
-              disabled={!isMicEnabled || isAudioPlaying}
+              disabled={!isMicEnabled || isAudioPlaying || isProcessingResponse}
               className={`w-14 h-14 rounded-full border-2 font-mono ${
                 isRecording 
                   ? 'bg-red-600/20 border-red-500 text-red-400 hover:bg-red-600/30' 
-                  : isMicEnabled 
+                  : (isMicEnabled && !isProcessingResponse && !isAudioPlaying)
                   ? 'bg-green-600/20 border-green-500 text-green-400 hover:bg-green-600/30' 
                   : 'bg-gray-600/20 border-gray-500 text-gray-500 cursor-not-allowed'
               }`}
@@ -100,8 +110,13 @@ const TerminalControls = ({
           {!isInterviewComplete && (
             isMicEnabled 
               ? isRecording
-                ? "$ recording... click mic or press [SPACE] to stop and send"
-                : "$ click mic or press [SPACE] to start recording" 
+                ? 
+                "$ recording... click mic or press [SPACE] to stop and send"
+                : 
+                <div className="flex flex-col gap-2">
+                  <p className="text-yellow-400">$ You will have 5 minutes to complete your response after turning on the mic</p>
+                  <p>{`$ click mic or press [SPACE] to start recording`}</p>
+                </div>
               : isAudioPlaying
               ? "$ audio stream active... please wait"
               : "$ initializing next prompt..."

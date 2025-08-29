@@ -16,6 +16,17 @@ export const startInterview = (resume, bio, token) => {
   });
 };
 
+export const transcribeAudio = (sessionId, audioBlob, token) => {
+  const formData = new FormData();
+  formData.append('audio', audioBlob, 'recording.webm');
+  return api.post(`/${sessionId}/transcribe`, formData, {
+    headers: {
+      'Authorization': `Bearer ${token}`
+      // Don't set Content-Type - let browser set it for FormData
+    }
+  });
+};
+
 export const getNextQuestion = (sessionId, answer, questionIndex, token) => {
   return api.post(`/${sessionId}/next`, {
     answer,

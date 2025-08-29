@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
 import useAuthStore from '../../stores/authStore';
 import { Button } from '../ui/button';
@@ -9,8 +9,12 @@ const Header = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
+  const location = useLocation();
   
   const { user, isAuthenticated, logout } = useAuthStore();
+  
+  // Check if we're on the interview page
+  const isOnInterviewPage = location.pathname === '/interview';
 
   const handleLogout = () => {
     logout();
@@ -42,7 +46,7 @@ const Header = () => {
   }, [isDropdownOpen]);
 
   return (
-    <header className="relative p-4 flex-shrink-0">
+    <header className={`relative p-4 flex-shrink-0 transition-all duration-300 ${isOnInterviewPage ? 'blur-sm pointer-events-none' : ''}`}>
       <Link to="/" className="text-white md:text-3xl text-xl font-bold tracking-wide hover:text-gray-300 transition-colors">
         INTERVIEW BUDDY
       </Link>

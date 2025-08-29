@@ -115,16 +115,16 @@ const ReportPage = () => {
         {/* Report Content */}
         <Tabs defaultValue="summary" className="pb-6">
           <TabsList className="grid w-full grid-cols-4 bg-white/10 backdrop-blur-md border-white/20">
-            <TabsTrigger value="summary" className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white">
+            <TabsTrigger value="summary" className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white cursor-pointer">
               Summary
             </TabsTrigger>
-            <TabsTrigger value="scores" className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white">
+            <TabsTrigger value="scores" className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white cursor-pointer">
               Scores
             </TabsTrigger>
-            <TabsTrigger value="feedback" className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white">
+            <TabsTrigger value="feedback" className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white cursor-pointer">
               Feedback
             </TabsTrigger>
-            <TabsTrigger value="conversation" className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white">
+            <TabsTrigger value="conversation" className="text-white data-[state=active]:bg-white/20 data-[state=active]:text-white cursor-pointer">
               History
             </TabsTrigger>
           </TabsList>

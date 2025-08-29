@@ -40,6 +40,8 @@ const InterviewPage = () => {
     isClosing,
     showExitConfirmation,
     isProcessingResponse,
+    timeRemaining,
+    isTimerActive,
     
     // Refs
     messagesEndRef,
@@ -52,12 +54,14 @@ const InterviewPage = () => {
     stopRecording,
     stopTTS,
     formatTime,
+    formatTimer,
+    getTimerColor,
     viewReport
   } = useInterviewLogic(sessionId, firstQuestion, firstQuestionAudioUrl, handleNavigation);
 
   return (
     <div 
-      className={`fixed inset-0 bg-black/40 backdrop-blur-md z-50 flex items-center justify-center p-4 transition-all duration-300 ease-out ${
+      className={`fixed inset-0 bg-black/40 backdrop-blur-md z-60 flex items-center justify-center p-4 transition-all duration-300 ease-out ${
         isVisible && !isClosing 
           ? 'opacity-100' 
           : 'opacity-0'
@@ -100,6 +104,10 @@ const InterviewPage = () => {
           isMicEnabled={isMicEnabled}
           isInterviewComplete={isInterviewComplete}
           isProcessingResponse={isProcessingResponse}
+          timeRemaining={timeRemaining}
+          isTimerActive={isTimerActive}
+          formatTimer={formatTimer}
+          getTimerColor={getTimerColor}
           onStopTTS={stopTTS}
           onStartRecording={startRecording}
           onStopRecording={stopRecording}

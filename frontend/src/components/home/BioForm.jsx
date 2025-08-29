@@ -13,6 +13,7 @@ const BioForm = ({
   resumeFile,
   bio,
   setBio,
+  onLoadingChange,
 }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -39,6 +40,7 @@ const BioForm = ({
       return;
     }
     setLoading(true);
+    onLoadingChange?.(true);
     try {
       const result = await startInterview(resumeFile, bio, token);
       if (result && result.data.sessionId && result.data.firstQuestion) {
@@ -75,6 +77,7 @@ const BioForm = ({
       }
     } finally {
       setLoading(false);
+      onLoadingChange?.(false);
     }
   };
 

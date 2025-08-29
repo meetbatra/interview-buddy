@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Upload, FileCheck, AlertTriangle } from "lucide-react";
 
-const ResumeUpload = ({ setResumeFile }) => {
+const ResumeUpload = ({ setResumeFile, disabled = false }) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState('');
@@ -57,6 +57,7 @@ const ResumeUpload = ({ setResumeFile }) => {
   };
 
   const handleFileChange = (e) => {
+    if (disabled) return;
     const file = e.target.files && e.target.files[0];
     if (file) {
       handleFileSelection(file);
@@ -64,18 +65,21 @@ const ResumeUpload = ({ setResumeFile }) => {
   };
 
   const handleDragOver = (e) => {
+    if (disabled) return;
     e.preventDefault();
     e.stopPropagation();
     setDragActive(true);
   };
 
   const handleDragLeave = (e) => {
+    if (disabled) return;
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
   };
 
   const handleDrop = (e) => {
+    if (disabled) return;
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
@@ -87,6 +91,7 @@ const ResumeUpload = ({ setResumeFile }) => {
   };
 
   const handleClick = () => {
+    if (disabled) return;
     inputRef.current?.click();
   };
 
@@ -97,11 +102,13 @@ const ResumeUpload = ({ setResumeFile }) => {
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         className={`border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center transition-colors h-[10rem] ${
-          dragActive 
-            ? "border-blue-400 bg-blue-400 bg-opacity-10" 
-            : "border-gray-600 hover:border-gray-500"
+          disabled 
+            ? "border-gray-700 bg-gray-800/50 cursor-not-allowed opacity-50" 
+            : dragActive 
+              ? "border-blue-400 bg-blue-400 bg-opacity-10" 
+              : "border-gray-600 hover:border-gray-500 cursor-pointer"
         }`}
-        style={{ cursor: "pointer" }}
+        style={{ cursor: disabled ? "not-allowed" : "pointer" }}
         tabIndex={0}
         onClick={handleClick}
       >
@@ -111,16 +118,25 @@ const ResumeUpload = ({ setResumeFile }) => {
           accept=".pdf"
           className="hidden"
           onChange={handleFileChange}
+          disabled={disabled}
           data-testid="resume-input"
         />
         <div className="flex flex-col items-center justify-center gap-2">
-          {selectedFile ? (
+          {disabled ? (
+            <div className="w-8 h-8 text-gray-500 mb-2 animate-spin">
+              <svg className="w-full h-full" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2V6M12 18V22M4.93 4.93L7.76 7.76M16.24 16.24L19.07 19.07M2 12H6M18 12H22M4.93 19.07L7.76 16.24M16.24 7.76L19.07 4.93" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+          ) : selectedFile ? (
             <FileCheck className="w-8 h-8 text-green-400 mb-2" />
           ) : (
             <Upload className="w-8 h-8 text-gray-400 mb-2" />
           )}
           <span className="text-gray-300 text-sm text-center">
-            {selectedFile ? (
+            {disabled ? (
+              <>Starting interview...</>
+            ) : selectedFile ? (
               <>Selected: <span className="font-medium text-white">{selectedFile.name}</span></>
             ) : (
               <>Drag & drop your PDF resume or click to browse</>

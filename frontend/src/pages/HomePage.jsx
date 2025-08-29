@@ -9,6 +9,7 @@ import CodeEditor from "../components/home/CodeEditor";
 const HomePage = () => {
   const [resumeFile, setResumeFile] = useState(null);
   const [bio, setBio] = useState('');
+  const [isInterviewStarting, setIsInterviewStarting] = useState(false);
   const navigate = useNavigate();
   
   const { user, isAuthenticated } = useAuthStore();
@@ -51,11 +52,15 @@ const HomePage = () => {
               )}
               
               <CodeEditor>
-                <ResumeUpload setResumeFile={setResumeFile} />
+                <ResumeUpload 
+                  setResumeFile={setResumeFile} 
+                  disabled={isInterviewStarting}
+                />
                 <BioForm
                   resumeFile={resumeFile}
                   bio={bio}
                   setBio={setBio}
+                  onLoadingChange={setIsInterviewStarting}
                 />
               </CodeEditor>
             </div>
