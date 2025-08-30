@@ -206,6 +206,62 @@ Return only the next question, nothing else.`;
   }
 }
 
+// End interview session
+module.exports.endInterview = async (req, res) => {
+  try {
+    // Check if user is authenticated
+    if (!req.user) {
+      return res.status(401).json({ error: 'Authentication required.' });
+    }
+
+    const { sessionId } = req.params;
+    // Note: We don't need the answer parameter since it was already processed by getNextQuestion
+
+    if (!sessionId) {
+      return res.status(400).json({ error: 'Session ID is required.' });
+    }
+
+    // Find the session and verify ownership
+    const session = await InterviewSession.findById(sessionId);
+    if (!session) {
+      return res.status(404).json({ error: 'Session not found.' });
+    }
+
+    // Verify that the session belongs to the authenticated user
+    if (session.userId.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ error: 'Access denied. This session does not belong to you.' });
+    }
+
+    // The final user answer should already be in conversation from getNextQuestion endpoint
+    // No need to add it again here
+
+    // Generate final completion message
+    const finalMessage = "Thank you for your time! You can see your results by clicking the button at the bottom right of this dialog.";
+    
+    // Generate audio for final message
+    const audioUrl = await generateSpeech(finalMessage);
+
+    // Add final message to conversation history
+    session.conversation.push({ role: 'ai', message: finalMessage });
+    
+    // Mark session as completed
+    session.completedAt = new Date();
+    await session.save();
+
+    res.json({ 
+      success: true, 
+      isComplete: true,
+      finalMessage: finalMessage,
+      audioUrl: audioUrl,
+      message: 'Interview completed successfully.'
+    });
+
+  } catch (err) {
+    console.error('Error ending interview:', err);
+    res.status(500).json({ error: 'Failed to end interview.' });
+  }
+}
+
 // Generate interview report
 module.exports.getReport = async (req, res) => {
   try {

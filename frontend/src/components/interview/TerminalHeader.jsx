@@ -31,7 +31,7 @@ const TerminalHeader = ({
             variant="ghost" 
             size="sm" 
             onClick={onClose}
-            className="text-gray-400 hover:text-red-400 transition-colors font-mono"
+            className="text-gray-400 hover:text-white hover:bg-gray-900 transition-colors font-mono"
           >
             exit
           </Button>

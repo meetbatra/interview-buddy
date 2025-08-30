@@ -40,7 +40,7 @@ const TerminalControls = ({
                 size="sm" 
                 variant="outline"
                 onClick={onStopTTS}
-                className="text-xs px-2 py-1 h-6 font-mono border-gray-600 text-gray-300 hover:text-white"
+                className="text-xs px-2 py-1 h-6 font-mono border-0 bg-red-600 text-white hover:bg-red-700 hover:text-white"
               >
                 stop
               </Button>

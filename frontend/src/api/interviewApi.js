@@ -39,6 +39,15 @@ export const getNextQuestion = (sessionId, answer, questionIndex, token) => {
   });
 };
 
+export const endInterview = (sessionId, token) => {
+  return api.post(`/${sessionId}/end`, {}, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    }
+  });
+};
+
 export const getReport = (sessionId, token) => {
   return api.get(`/${sessionId}/report`, {
     headers: {

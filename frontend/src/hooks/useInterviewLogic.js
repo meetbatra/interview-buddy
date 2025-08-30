@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import useAuthStore from '../stores/authStore';
-import { getNextQuestion, transcribeAudio } from '../api/interviewApi';
+import { getNextQuestion, transcribeAudio, endInterview } from '../api/interviewApi';
 
 export const useInterviewLogic = (sessionId, firstQuestion, firstQuestionAudioUrl, onClose) => {
   // Get auth token
@@ -274,27 +274,75 @@ export const useInterviewLogic = (sessionId, firstQuestion, firstQuestionAudioUr
 
       if (data.success) {
         if (data.isComplete) {
-          setIsProcessingResponse(false);
-          const completionMessage = {
-            id: `msg-${Date.now()}-completion`,
-            type: 'system',
-            text: "Thank you for your time! You can see your results by clicking the button at the bottom right of this dialog.",
-            timestamp: new Date()
-          };
-          setMessages(prev => [...prev, completionMessage]);
-          
-          // Play completion message with Murf TTS
-          setTimeout(() => {
-            speakQuestion(
-              "Thank you for your time! You can see your results by clicking the button at the bottom right of this dialog.",
-              null // No audio URL, will use text-to-speech
-            );
+          // Call the end interview endpoint to get the final message and audio
+          try {
+            const endResponse = await endInterview(sessionId, token);
+            const endData = endResponse.data;
             
-            // Set interview complete after a short delay to allow the message to play
+            if (endData.success) {
+              setIsProcessingResponse(false);
+              const completionMessage = {
+                id: `msg-${Date.now()}-completion`,
+                type: 'system',
+                text: endData.finalMessage,
+                timestamp: new Date()
+              };
+              setMessages(prev => [...prev, completionMessage]);
+              
+              // Play completion message with Murf TTS audio from backend
+              setTimeout(() => {
+                speakQuestion(endData.finalMessage, endData.audioUrl);
+                
+                // Set interview complete after a short delay to allow the message to play
+                setTimeout(() => {
+                  setIsInterviewComplete(true);
+                }, 3000);
+              }, 500);
+            } else {
+              // Fallback to local message if endpoint fails
+              setIsProcessingResponse(false);
+              const completionMessage = {
+                id: `msg-${Date.now()}-completion`,
+                type: 'system',
+                text: "Thank you for your time! You can see your results by clicking the button at the bottom right of this dialog.",
+                timestamp: new Date()
+              };
+              setMessages(prev => [...prev, completionMessage]);
+              
+              setTimeout(() => {
+                speakQuestion(
+                  "Thank you for your time! You can see your results by clicking the button at the bottom right of this dialog.",
+                  null
+                );
+                
+                setTimeout(() => {
+                  setIsInterviewComplete(true);
+                }, 3000);
+              }, 500);
+            }
+          } catch (endError) {
+            console.error('Error ending interview:', endError);
+            // Fallback to local message if endpoint fails
+            setIsProcessingResponse(false);
+            const completionMessage = {
+              id: `msg-${Date.now()}-completion`,
+              type: 'system',
+              text: "Thank you for your time! You can see your results by clicking the button at the bottom right of this dialog.",
+              timestamp: new Date()
+            };
+            setMessages(prev => [...prev, completionMessage]);
+            
             setTimeout(() => {
-              setIsInterviewComplete(true);
-            }, 3000);
-          }, 500);
+              speakQuestion(
+                "Thank you for your time! You can see your results by clicking the button at the bottom right of this dialog.",
+                null
+              );
+              
+              setTimeout(() => {
+                setIsInterviewComplete(true);
+              }, 3000);
+            }, 500);
+          }
         } else {
           setIsProcessingResponse(false);
           const nextQuestion = {
