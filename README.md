@@ -88,7 +88,7 @@ cd backend
 npm install
 
 # Create .env file
-cp .env.example .env
+touch .env
 ```
 
 Configure your `.env` file:
@@ -113,7 +113,7 @@ cd ../frontend
 npm install
 
 # Create .env file
-cp .env.example .env
+touch .env
 ```
 
 Configure your frontend `.env` file:
@@ -130,7 +130,6 @@ npm run dev
 ### 4. Access the Application
 - **Frontend**: http://localhost:5173
 - **Backend API**: http://localhost:8080
-- **API Documentation**: http://localhost:8080/api/docs
 
 ## 📖 How to Use
 
@@ -275,22 +274,7 @@ Your interview is evaluated across multiple dimensions:
 - **Rate Limiting**: API protection against abuse
 - **CORS Configuration**: Secure cross-origin requests
 
-## 🚀 Deployment
-
-### **Backend Deployment (Recommended: Railway/Render)**
-1. Set up environment variables
-2. Configure MongoDB Atlas
-3. Deploy backend service
-4. Update CORS settings for production
-
-### **Frontend Deployment (Recommended: Vercel/Netlify)**
-1. Build production bundle: `npm run build`
-2. Configure environment variables
-3. Deploy static files
-4. Update API URLs for production
-
 ### **Environment Variables for Production**
-Update your production environment with:
 - `MONGODB_URI` - MongoDB connection string
 - `JWT_SECRET` - JWT signing secret
 - `GEMINI_API_KEY` - Google Gemini AI API key
@@ -314,7 +298,6 @@ Update your production environment with:
 For support, questions, or feature requests:
 - Create an issue on GitHub
 - Email: [meetbatra56@example.com]
-- Documentation: [Link to detailed docs]
 
 ## 🏆 Acknowledgments
 
