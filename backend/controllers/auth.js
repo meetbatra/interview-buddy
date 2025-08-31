@@ -142,23 +142,7 @@ module.exports.login = async (req, res) => {
   }
 };
 
-// Get current user (protected route)
-module.exports.getMe = async (req, res) => {
-  try {
-    res.status(200).json({
-      success: true,
-      data: {
-        user: req.user
-      }
-    });
-  } catch (error) {
-    console.error('Get me error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Internal server error'
-    });
-  }
-};
+// Google OAuth login (Access Token approach)
 
 // Google OAuth login (Access Token approach)
 module.exports.googleLogin = async (req, res) => {

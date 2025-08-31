@@ -83,11 +83,11 @@ const BioForm = ({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {/* Authentication notice for non-logged in users */}
+            {/* Authentication notice for non-logged in users */}
       {!isAuthenticated && (
         <Alert className="bg-blue-500/10 border-blue-500/20 text-blue-300">
           <Info className="h-4 w-4" />
-          <AlertDescription>
+          <AlertDescription className="text-blue-300">
             <strong>Login required:</strong> Please log in to start an interview and save your progress.
           </AlertDescription>
         </Alert>

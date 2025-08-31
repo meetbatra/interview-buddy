@@ -15,14 +15,6 @@ export const signup = (username, email, password) => {
   return api.post('/signup', { username, email, password });
 };
 
-export const getCurrentUser = (token) => {
-  return api.get('/current-user', {
-    headers: {
-      'Authorization': `Bearer ${token}`
-    }
-  });
-};
-
 export const googleLogin = (token) => {
   return api.post('/google', { token });
 };

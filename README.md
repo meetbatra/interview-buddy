@@ -27,11 +27,13 @@ A comprehensive, AI-driven interview preparation platform that simulates real in
 - **Auto-save Progress**: Conversation history saved in real-time
 - **Completion Tracking**: Mark sessions as completed with timestamps
 
-### 📊 **Comprehensive Analytics**
+### 📊 **Comprehensive Analytics & Dashboard**
 - **Performance Scores**: Technical, Communication, and Confidence ratings (0-10)
 - **Detailed Feedback**: AI-generated strengths and weaknesses analysis
-- **Conversation History**: Complete transcript of your interview session
-- **Progress Tracking**: Historical performance across multiple sessions
+- **Dashboard Overview**: Performance metrics and analytics across all sessions
+- **Interview History**: Paginated view of all past interviews with scores
+- **Progress Tracking**: Historical performance visualization and improvement trends
+- **Session Reports**: Complete transcript and detailed analysis for each interview
 
 ### 🔐 **Secure Authentication**
 - **Multiple Login Options**: Email/password and Google OAuth
@@ -155,25 +157,63 @@ npm run dev
 - Read AI-generated feedback on strengths and areas for improvement
 - Access complete conversation transcript
 
+### 6. **Track Progress**
+- View dashboard with performance analytics
+- Browse interview history with pagination
+- Monitor improvement trends over time
+- Compare scores across multiple sessions
+
 ## 🏗️ Project Structure
 
 ```
 interview-buddy/
 ├── backend/                 # Node.js backend application
 │   ├── controllers/         # Route handlers and business logic
+│   │   ├── auth.js         # Authentication (signup, login, Google OAuth)
+│   │   ├── dashboard.js    # Dashboard analytics and interview history
+│   │   └── interview.js    # Interview management and processing
 │   ├── models/             # MongoDB schemas and models
+│   │   ├── user.js         # User model with authentication fields
+│   │   └── interviewSession.js # Interview session with conversation history
 │   ├── routes/             # API route definitions
+│   │   ├── auth.js         # Authentication routes
+│   │   ├── dashboard.js    # Dashboard and analytics routes
+│   │   └── interview.js    # Interview management routes
 │   ├── services/           # External API integrations
-│   ├── middleware/         # Authentication and validation
+│   │   ├── geminiService.js    # Google Gemini AI integration
+│   │   ├── speechToTextService.js # Deepgram speech-to-text
+│   │   ├── murffService.js     # Murf text-to-speech
+│   │   └── pdfService.js       # PDF resume parsing
+│   ├── middleware/         # Authentication and validation middleware
 │   ├── config/            # Database and app configuration
-│   └── uploads/           # Temporary file storage
+│   ├── utils/             # Utility functions (JWT, etc.)
+│   └── uploads/           # Temporary file storage (resumes, audio)
 ├── frontend/               # React frontend application
 │   ├── src/
 │   │   ├── components/    # Reusable UI components
+│   │   │   ├── auth/      # Authentication components
+│   │   │   ├── dashboard/ # Dashboard and analytics components
+│   │   │   ├── home/      # Home page components
+│   │   │   ├── interview/ # Interview session components
+│   │   │   ├── report/    # Report and results components
+│   │   │   ├── shared/    # Shared UI components
+│   │   │   └── ui/        # Base UI components (buttons, inputs, etc.)
 │   │   ├── pages/         # Main application pages
+│   │   │   ├── HomePage.jsx       # Landing page with resume upload
+│   │   │   ├── LoginPage.jsx      # User authentication
+│   │   │   ├── SignupPage.jsx     # User registration
+│   │   │   ├── DashboardPage.jsx  # Analytics dashboard
+│   │   │   ├── InterviewPage.jsx  # Interview session
+│   │   │   └── ReportPage.jsx     # Interview results
 │   │   ├── hooks/         # Custom React hooks
+│   │   │   └── useInterviewLogic.js # Interview session management
 │   │   ├── stores/        # Zustand state management
+│   │   │   ├── authStore.js       # Authentication state
+│   │   │   └── interviewStore.js  # Interview session state
 │   │   ├── api/          # API service functions
+│   │   │   ├── userApi.js         # Authentication API calls
+│   │   │   ├── interviewApi.js    # Interview management API
+│   │   │   └── dashboardApi.js    # Dashboard and analytics API
 │   │   └── assets/       # Static assets and images
 │   └── public/           # Public static files
 └── README.md             # Project documentation
@@ -181,21 +221,21 @@ interview-buddy/
 
 ## 🔧 API Endpoints
 
-### **Authentication**
-- `POST /api/auth/register` - User registration
-- `POST /api/auth/login` - User login
-- `POST /api/auth/google` - Google OAuth login
+### **Authentication (`/api/auth`)**
+- `POST /api/auth/signup` - User registration with username, email, password
+- `POST /api/auth/login` - User login with email/password
+- `POST /api/auth/google` - Google OAuth authentication
 
-### **Interviews**
-- `POST /api/interview/start` - Start new interview session
-- `POST /api/interview/:id/transcribe` - Transcribe audio response
-- `POST /api/interview/:id/next` - Get next question
-- `POST /api/interview/:id/end` - End interview session
-- `GET /api/interview/:id/report` - Get interview report
+### **Interview Management (`/api/interview`)**
+- `POST /api/interview/start` - Start new interview session (with resume upload)
+- `POST /api/interview/:sessionId/transcribe` - Transcribe audio response to text
+- `POST /api/interview/:sessionId/next` - Get next question based on previous answer
+- `POST /api/interview/:sessionId/end` - End interview and get final completion message
+- `GET /api/interview/:sessionId/report` - Get detailed interview performance report
 
-### **User Management**
-- `GET /api/user/profile` - Get user profile
-- `GET /api/user/history` - Get interview history
+### **Dashboard & Analytics (`/api/dashboard`)**
+- `GET /api/dashboard/overview` - Get dashboard analytics and performance metrics
+- `GET /api/dashboard/history` - Get paginated interview history with scores
 
 ## 🎯 Key Features in Detail
 
@@ -211,17 +251,20 @@ The AI interviewer generates questions that:
 - **Natural AI Voice**: Murf's premium TTS creates a realistic interviewer experience
 - **Optimized Audio Flow**: Smart mic management prevents feedback and ensures smooth conversation
 
-### **Comprehensive Performance Analysis**
+### **Multi-Dimensional Performance Analysis**
 Your interview is evaluated across multiple dimensions:
 - **Technical Skills**: Knowledge depth and problem-solving approach
 - **Communication**: Clarity, structure, and articulation
 - **Confidence**: Delivery, poise, and presence
+- **Overall Performance**: Comprehensive scoring with detailed feedback
 
 ### **Smart Session Management**
 - Sessions auto-save progress every response
 - Resume interrupted interviews seamlessly
 - Timer management with visual countdown
 - Automatic submission prevents incomplete sessions
+- Dashboard analytics for progress tracking
+- Historical performance comparison
 
 ## 🔒 Security Features
 
@@ -248,11 +291,15 @@ Your interview is evaluated across multiple dimensions:
 
 ### **Environment Variables for Production**
 Update your production environment with:
-- Database connection strings
-- API keys for all services
-- JWT secrets
-- CORS origins
-- File upload limits
+- `MONGODB_URI` - MongoDB connection string
+- `JWT_SECRET` - JWT signing secret
+- `GEMINI_API_KEY` - Google Gemini AI API key
+- `DEEPGRAM_API_KEY` - Deepgram speech-to-text API key
+- `MURF_API_KEY` - Murf text-to-speech API key
+- `GOOGLE_CLIENT_ID` - Google OAuth client ID
+- `PORT` - Server port (default: 8080)
+- `VITE_API_URL` - Backend API URL for frontend
+- `VITE_GOOGLE_CLIENT_ID` - Google OAuth client ID for frontend
 
 ## 🤝 Contributing
 
