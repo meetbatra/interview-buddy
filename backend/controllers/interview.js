@@ -1,5 +1,5 @@
 const { parseResume } = require("../services/pdfService");
-const { generateContent } = require("../services/geminiService");
+const { generateContent } = require("../services/aiService");
 const { generateSpeech } = require("../services/murffService");
 const { transcribeAudio } = require("../services/speechToTextService");
 const InterviewSession = require("../models/interviewSession");
@@ -29,8 +29,8 @@ module.exports.startInterview = async (req, res) => {
     }
     
     const prompt = `You are an interviewer. Based on this resume: ${resumeText} and this bio: ${bio}, return a JSON object with two fields: "resumeSummary" (bullet points summarizing skills, projects, and education) and "firstQuestion" (the first interview question to ask).`;
-    const geminiResponse = await generateContent(prompt);
-    let cleanedResponse = geminiResponse
+    const aiResponse = await generateContent(prompt);
+    let cleanedResponse = aiResponse
       .replace(/```json/g, "")
       .replace(/```/g, "")
       .trim();
@@ -160,7 +160,7 @@ module.exports.getNextQuestion = async (req, res) => {
       });
     }
 
-    // Build conversation context for Gemini
+    // Build conversation context for AI
     const conversationHistory = session.conversation
       .map(msg => `${msg.role === 'ai' ? 'Interviewer' : 'Candidate'}: ${msg.message}`)
       .join('\n');

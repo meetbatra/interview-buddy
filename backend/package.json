@@ -12,8 +12,9 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@ai-sdk/openai": "^3.0.26",
     "@deepgram/sdk": "^4.11.2",
-    "@google/genai": "^1.15.0",
+    "ai": "^6.0.77",
     "axios": "^1.11.0",
     "bcryptjs": "^3.0.2",
     "chalk": "^4.1.2",
