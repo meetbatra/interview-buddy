@@ -1,5 +1,5 @@
 const { parseResume } = require("../services/pdfService");
-const { generateContent } = require("../services/geminiService");
+const { generateContent } = require("../services/aiService");
 const { generateSpeech } = require("../services/murffService");
 const { transcribeAudio } = require("../services/speechToTextService");
 const InterviewSession = require("../models/interviewSession");

@@ -10,7 +10,7 @@ A comprehensive, AI-driven interview preparation platform that simulates real in
 ## 🌟 Key Features
 
 ### 🤖 **AI-Powered Interview Engine**
-- **Dynamic Question Generation**: Context-aware questions using Google's Gemini AI
+- **Dynamic Question Generation**: Context-aware questions using OpenAI GPT-4.1-mini
 - **Intelligent Follow-ups**: Questions adapt based on your responses and resume
 - **10-Question Interview**: Structured interview flow with professional pacing
 - **Resume Analysis**: AI analyzes your uploaded resume to generate relevant questions
@@ -54,7 +54,7 @@ A comprehensive, AI-driven interview preparation platform that simulates real in
 - **Database**: MongoDB with Mongoose ODM
 - **Authentication**: JWT tokens with bcrypt encryption
 - **File Processing**: Multer for resume uploads, PDF parsing
-- **AI Integration**: Google Gemini AI, Deepgram, Murf APIs
+- **AI Integration**: OpenAI GPT-4.1-mini (via AI Pipe), Deepgram, Murf APIs
 
 ### **Frontend**
 - **Framework**: React 18 with Vite build tool
@@ -65,7 +65,7 @@ A comprehensive, AI-driven interview preparation platform that simulates real in
 - **UI Components**: Custom terminal-themed component library
 
 ### **AI Services**
-- **🧠 Google Gemini**: Dynamic question generation and analysis
+- **🧠 OpenAI GPT-4.1-mini**: Dynamic question generation and analysis (via AI Pipe proxy)
 - **🎤 Deepgram Nova-3**: Professional speech-to-text transcription
 - **🗣️ Murf TTS**: High-quality text-to-speech synthesis
 
@@ -74,7 +74,7 @@ A comprehensive, AI-driven interview preparation platform that simulates real in
 ### Prerequisites
 - Node.js 18+ and npm
 - MongoDB database
-- API keys for Gemini, Deepgram, and Murf
+- API keys for AI Pipe (OpenAI proxy), Deepgram, and Murf
 
 ### 1. Clone the Repository
 ```bash
@@ -94,13 +94,16 @@ touch .env
 Configure your `.env` file:
 ```env
 PORT=8080
-MONGODB_URI=your_mongodb_connection_string
+MONGO_URI=your_mongodb_connection_string
 JWT_SECRET=your_jwt_secret_key
-GEMINI_API_KEY=your_google_gemini_api_key
+AI_PIPE_KEY=your_ai_pipe_api_key
+AI_PIPE_URL=https://aipipe.org/openai/v1
 DEEPGRAM_API_KEY=your_deepgram_api_key
 MURF_API_KEY=your_murf_api_key
 GOOGLE_CLIENT_ID=your_google_oauth_client_id
 ```
+
+**Note**: This project uses [AI Pipe](https://aipipe.org) as a proxy service to access OpenAI GPT-4.1-mini. You'll need to obtain an API key from AI Pipe instead of directly from OpenAI.
 
 ```bash
 # Start backend server
@@ -179,7 +182,7 @@ interview-buddy/
 │   │   ├── dashboard.js    # Dashboard and analytics routes
 │   │   └── interview.js    # Interview management routes
 │   ├── services/           # External API integrations
-│   │   ├── geminiService.js    # Google Gemini AI integration
+│   │   ├── aiService.js    # AI integration
 │   │   ├── speechToTextService.js # Deepgram speech-to-text
 │   │   ├── murffService.js     # Murf text-to-speech
 │   │   └── pdfService.js       # PDF resume parsing
@@ -275,9 +278,10 @@ Your interview is evaluated across multiple dimensions:
 - **CORS Configuration**: Secure cross-origin requests
 
 ### **Environment Variables for Production**
-- `MONGODB_URI` - MongoDB connection string
+- `MONGO_URI` - MongoDB connection string
 - `JWT_SECRET` - JWT signing secret
-- `GEMINI_API_KEY` - Google Gemini AI API key
+- `AI_PIPE_KEY` - AI Pipe API key for OpenAI GPT-4.1-mini access
+- `AI_PIPE_URL` - AI Pipe proxy URL (https://aipipe.org/openai/v1)
 - `DEEPGRAM_API_KEY` - Deepgram speech-to-text API key
 - `MURF_API_KEY` - Murf text-to-speech API key
 - `GOOGLE_CLIENT_ID` - Google OAuth client ID
@@ -301,7 +305,7 @@ For support, questions, or feature requests:
 
 ## 🏆 Acknowledgments
 
-- **Google Gemini AI** for intelligent conversation generation
+- **OpenAI GPT-4.1-mini** for intelligent conversation generation
 - **Deepgram** for professional speech-to-text processing
 - **Murf** for high-quality text-to-speech synthesis
 - **MongoDB** for robust data storage
